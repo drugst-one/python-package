@@ -2,7 +2,7 @@ import requests
 import time
 from methods.map_nodes_to_internal_ids import map_nodes_to_internal_ids
 from methods.start_task import start_task
-from data.url import Url
+from methods.constants.url import Url
 
 class Task:
 
@@ -30,19 +30,26 @@ class Task:
             while task_status != "Done.":
                 time.sleep(1)
                 task_response = requests.get(
-                    Url.TASK.value + "/?token=" + self.token,
+                    Url.TASK + "?token=" + self.token,
                     headers={ 'Content-Type': 'application/json' }, 
                     verify=False
                     )
                 task_obj = task_response.json()
                 task_info = task_obj.get("info")
                 task_status = task_info.get("status", "")
-            print(task_obj)
+            # print(task_obj)
+    
 
+    def get_task_results(self):
 
+        view =  ""
+        fmt = "csv"
+        url_parameter = "?view=" + view + "&fmt=" + fmt + "&token=" + self.token
 
+        task_results_response = requests.get(
+                    Url.TASK_RESULTS + url_parameter,
+                    headers={ 'Content-Type': 'application/json' }, 
+                    verify=False
+                    )
 
-
-t = Task()
-t.start_task(["PTEN", "TP53"])
-t.get_task()
+        print(task_results_response.text)

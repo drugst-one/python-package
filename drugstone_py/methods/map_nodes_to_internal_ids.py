@@ -1,5 +1,5 @@
 import requests
-from data.url import Url
+from methods.constants.url import Url
 
     
 """
@@ -12,7 +12,7 @@ def map_nodes_to_internal_ids(nodes: list) -> list:
     for node in nodes:
         formatted_nodes.append({"id": str(node)})
     
-    # identifier: symbol, uniprot, ensemble
+    # identifier: symbol, uniprot, ensg
     data = {
         "nodes": formatted_nodes, 
         "identifier": "symbol"
@@ -23,7 +23,7 @@ def map_nodes_to_internal_ids(nodes: list) -> list:
     and recieves an extendet list with the internal IDs
     """
     extended_node_ids = requests.post(
-        Url.MAP_NODES.value,
+        Url.MAP_NODES,
         verify=False, 
         json=data
         )

@@ -1,5 +1,5 @@
 import requests
-from data.url import Url
+from methods.constants.url import Url
 
 """
 Starts a task and returns the token for it.
@@ -10,6 +10,7 @@ def start_task(ids: list) -> str:
     # algorithms: multisteiner, keypathwayminer, trustrank, closeness,degree, proximity, betweenness
     # ppi_dataset: STRING, BioGRID, APID
     # pdi_dataset: drugbank, chembl, dgidb
+    # target: drug, drug-target
     data = {
         "algorithm": "trustrank", 
         "parameters": {"ppi_dataset": "STRING", "pdi_dataset": "drugbank", "seeds": ids}, 
@@ -17,7 +18,7 @@ def start_task(ids: list) -> str:
     }
 
     start_task_response = requests.post(
-        Url.TASK.value,
+        Url.TASK,
         verify=False, 
         json=data
         )
