@@ -1,21 +1,23 @@
 import requests
-from methods.constants.url import Url
+from services.methods.constants.url import Url
 
     
 """
 Maps the given nodes to the internal IDs.
 Returns a list of the internal IDs for 
+Parameters:
+    * nodes: list of nodes
+    * identifier: defaults to 'symbol'
 """
-def map_nodes_to_internal_ids(nodes: list) -> list:
+def map_nodes_to_internal_ids(nodes: list, identifier:str) -> list:
 
     formatted_nodes = []
     for node in nodes:
         formatted_nodes.append({"id": str(node)})
-    
-    # identifier: symbol, uniprot, ensg
+
     data = {
         "nodes": formatted_nodes, 
-        "identifier": "symbol"
+        "identifier": identifier
         }
     
     """
