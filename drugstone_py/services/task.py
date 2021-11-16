@@ -4,7 +4,7 @@ from services.methods.map_nodes_to_internal_ids import map_nodes_to_internal_ids
 from services.methods.start_task import start_task
 from services.methods.constants.url import Url
 from services.methods.constants.task_parameters import TaskParameters
-from services.task_result import TaskResult
+from services.models.task_result import TaskResult
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
