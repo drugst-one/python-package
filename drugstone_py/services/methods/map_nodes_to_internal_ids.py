@@ -9,7 +9,7 @@ Parameters:
     * nodes: list of nodes
     * identifier: defaults to 'symbol'
 """
-def map_nodes_to_internal_ids(nodes: list, identifier:str) -> list:
+def map_nodes_to_internal_ids(nodes: list, identifier: str) -> list:
 
     formatted_nodes = []
     for node in nodes:
