@@ -1,3 +1,4 @@
+import json
 import requests
 import time
 import urllib3
@@ -14,20 +15,34 @@ logging.getLogger().setLevel(logging.INFO)
 
 class Task:
 
-    # The token gets assigned by the start_task function.
-    __token = ""
+    def __init__(self) -> None:
+        # The token and the task_name are assigned by the start_task function.
+        self.token: str
+        self.task_name: str
 
-    """
-    Mapps the nodes to the internal IDS
-    and starts a task.
-    """
-    def new_task(self, nodes: list, params: dict):
-        map_nodes_identifier = ""
-        if "identifier" in params and hasattr(TaskParameter.IdentifierValues, str(params["identifier"]).upper()):
+    
+    def initiate_new_task(self, nodes: list, params: dict, name: str):
+        """
+        Mapps the nodes to the internal IDs
+        and starts a task.
+        """
+
+        # sets the task name 
+        self.task_name = name
+        
+        # looks whether there is an identifier in the params 
+        # or else gets the default identifier  
+        map_nodes_identifier: str
+        if "identifier" in params and hasattr(TaskParameter.IdentifierValues, params["identifier"].upper()):
             map_nodes_identifier = params["identifier"]
         else:
             map_nodes_identifier = self.__normalize_task_parameter({}, [])["parameters"]["config"]["identifier"]
+        
+        # gets the internal ids for the nodes 
         internal_ids = map_nodes_to_internal_ids(nodes, map_nodes_identifier)
+
+        # calls the start_task function, which starts the task and returns the token 
+        # sets the token
         normalized_params = self.__normalize_task_parameter(params, internal_ids)
         self.__token = start_task(normalized_params)
       
@@ -53,7 +68,7 @@ class Task:
     def is_done(self) -> bool:
         return self.get_info()["done"]
 
-    
+
     def is_failed(self) -> bool:
         return self.get_info()["failed"]
 
@@ -61,14 +76,15 @@ class Task:
     def wait_for_task_to_finish(self) -> bool:
         while not self.is_done() and not self.is_failed():
             time.sleep(1)
-            logging.info("Task progress is at: " + str(self.get_progress()))
+            logging.info(self.task_name + " progress is at: " + str(self.get_progress()))
         if self.is_done():
-            logging.info("The task is done.")
+            logging.info(self.task_name + " is done.")
             return True
         elif self.is_failed():
-            warnings.warn("The task is failed!")
+            warnings.warn(self.task_name + " has failed!")
             return False
         
+
     def get_result(self) -> TaskResult:
         if self.is_done():
             url_parameter = "?view=&fmt=&token=" + self.__token
@@ -78,19 +94,19 @@ class Task:
                         )
             return TaskResult(task_result_response.json())
         elif self.is_failed():
-            logging.warning("The task failed!")
+            logging.warning(self.task_name + " has failed!")
         else:
             logging.warning(
-                """The task was not done! 
+                self.task_name + 
+                """ was not done! 
                 Could not return the result dictionary! 
                 Wait for the task to finish!"""
                 )
             return {}
     
-    """
-    Normalizes the parameter dictionary from the user.
-    """
+
     def __normalize_task_parameter(self, user_params: dict, seeds: list) -> dict:
+        """Normalizes the parameter dictionary from the user."""
 
         normalized_params = {
             "algorithm": "trustrank", 
