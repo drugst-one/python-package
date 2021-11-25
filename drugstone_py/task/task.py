@@ -17,7 +17,7 @@ class Task:
 
     def __init__(self) -> None:
         # The token and the task_name are assigned by the start_task function.
-        self.token: str
+        self.__token: str
         self.task_name: str
 
     def initiate_new_task(self, seeds: list, params: dict, name: str):
@@ -44,7 +44,6 @@ class Task:
         # sets the token
         normalized_params = self.__normalize_task_parameter(params, internal_ids)
         self.__token = start_task(normalized_params)
-      
 
     def get_info(self) -> dict:
         if len(self.__token) == 0:
@@ -55,23 +54,18 @@ class Task:
                 Url.TASK + "?token=" + self.__token,
                 verify=False).json()["info"]
 
-
     def get_progress(self) -> float:
         return self.get_info()["progress"]
 
-    
     def get_status(self) -> str:
         return self.get_info()["status"]
 
-    
     def is_done(self) -> bool:
         return self.get_info()["done"]
-
 
     def is_failed(self) -> bool:
         return self.get_info()["failed"]
 
-    
     def wait_for_task_to_finish(self) -> bool:
         while not self.is_done() and not self.is_failed():
             time.sleep(1)
@@ -82,7 +76,6 @@ class Task:
         elif self.is_failed():
             warnings.warn(self.task_name + " has failed!")
             return False
-        
 
     def get_result(self) -> TaskResult:
         if self.is_done():
@@ -102,18 +95,16 @@ class Task:
                 Wait for the task to finish!"""
                 )
             return {}
-    
 
-    def __normalize_task_parameter(self, user_params: dict, seeds: list) -> dict:
+    @staticmethod
+    def __normalize_task_parameter(user_params: dict, seeds: list) -> dict:
         """Normalizes the parameter dictionary from the user."""
 
         normalized_params = {
             "algorithm": "trustrank", 
-            # "target": "drug", 
-            "target": "drug-target", 
+            "target": "drug",
             "parameters": {
-                # "target": "drug", 
-                "target": "drug-target", 
+                "target": "drug",
                 "ppi_dataset": "STRING", 
                 "pdi_dataset": "drugbank", 
                 "config": {"identifier": "symbol"},

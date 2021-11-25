@@ -1,6 +1,7 @@
 from task.task import Task
 from task.scripts.constants.task_parameter import TaskParameter
 
+
 class Drugstone:
     """The starting point of the Drugstone package.
 
@@ -23,9 +24,9 @@ class Drugstone:
         Returns an TaskParameter object.
     """
 
-    __number_of_tasks : int = 1
+    __number_of_tasks: int = 1
     
-    def new_task(self, seeds: list, params: dict={}, name:str="") -> Task:
+    def new_task(self, seeds: list, params: dict = dict({}), name: str = "") -> Task:
         """Returns a task object with the running task.
         
         Initializes a new Task object 
@@ -49,6 +50,7 @@ class Drugstone:
         t.initiate_new_task(seeds, params, name)
         return t
 
-    def get_task_parameters(self) -> TaskParameter:
+    @staticmethod
+    def get_task_parameters() -> TaskParameter:
         """Returns an TaskParameter object."""
         return TaskParameter()

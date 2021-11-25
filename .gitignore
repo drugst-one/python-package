@@ -1,6 +1,7 @@
 # test file
 test.py
 test_data/
+.idea/
 
 
 # Byte-compiled / optimized / DLL files
