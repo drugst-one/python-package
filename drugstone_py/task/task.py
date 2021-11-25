@@ -12,6 +12,7 @@ from task.task_result import TaskResult
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.getLogger().setLevel(logging.INFO)
 
+
 class Task:
 
     def __init__(self) -> None:
@@ -19,7 +20,6 @@ class Task:
         self.token: str
         self.task_name: str
 
-    
     def initiate_new_task(self, seeds: list, params: dict, name: str):
         """
         Mapps the nodes to the internal IDs
