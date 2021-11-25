@@ -43,13 +43,31 @@ class TaskResult:
         with open(downloads_path, "x") as f:
             json.dump(self.nodes, f, indent=4)
 
-    def to_csv(self):
+    def to_csv(self) -> None:
         # downloads_path = self.path_to_download_folder + "test.csv"
         downloads_path = str(Path.home() / "Downloads/results.csv")
         df = pd.DataFrame(self.nodes).T
         df.to_csv(downloads_path)
 
-    def edges_to_csv(self):
+    def proteins_to_csv(self) -> None:
+        downloads_path = str(Path.home() / "Downloads/proteins.csv")
+        data = {}
+        for name, detail in self.nodes.items():
+            if detail["node_type"] == "protein":
+                data[name] = detail
+        df = pd.DataFrame(data).T
+        df.to_csv(downloads_path)
+
+    def drugs_to_csv(self) -> None:
+        downloads_path = str(Path.home() / "Downloads/drugs.csv")
+        data = {}
+        for name, detail in self.nodes.items():
+            if detail["node_type"] == "drug":
+                data[name] = detail
+        df = pd.DataFrame(data).T
+        df.to_csv(downloads_path)
+
+    def edges_to_csv(self) -> None:
         # downloads_path = self.path_to_download_folder + "edges.xlsx"
         downloads_path = str(Path.home() / "Downloads/edges.csv")
 
