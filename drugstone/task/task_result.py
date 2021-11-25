@@ -16,7 +16,7 @@ class TaskResult():
         self.path_to_download_folder = str(Path.home() / "Downloads/")
 
 
-    def get(self) -> dict:
+    def to_dict(self) -> dict:
         """Returns a dict with the result."""
         return self.nodes
 
@@ -57,22 +57,33 @@ class TaskResult():
 
 
     def edges_to_csv(self):
-        data = {}
         # downloads_path = self.path_to_download_folder + "edges.xlsx"
         downloads_path = str(Path.home() / "Downloads/edges.csv")
 
-        def is_edge(start: str, end: str):
-            for e in self.nodes[start]["edges"]:
-                if e["to"] == end:
-                    return 1
-            return 0
+        edges = []
+        for n in [*self.nodes]:
+            for e in self.nodes[n]["edges"]:
+                edges.append([e["from"], e["to"]])
 
-        for node in [*self.nodes]:
-            data[node] = {}
+        data = {}
+        for n in [*self.nodes]:
+            data[n] = {}
             for e in [*self.nodes]:
-                data[node][e] = is_edge(node,e)
+                data[n][e] = 1 if [n,e] in edges or [e,n] in edges else 0
+                    
+
+        # def is_edge(start: str, end: str):
+        #     for e in self.nodes[start]["edges"]:
+        #         if e["to"] == end:
+        #             return 1
+        #     return 0
+
+        # for node in [*self.nodes]:
+        #     data[node] = {}
+        #     for e in [*self.nodes]:
+        #         data[node][e] = is_edge(node,e)
         
-        df = pd.DataFrame(data).T
+        df = pd.DataFrame(data)
         df.to_csv(downloads_path)
 
 
@@ -107,7 +118,7 @@ class TaskResult():
         "Downloads a praph of the nodes in a html file."
 
         # The network.
-        net = Network(height='90%', width='100%', directed=True)
+        net = Network(height='90%', width='100%')
 
         # Adds the nodes to the network with a random color.
         for n in [*self.nodes]:

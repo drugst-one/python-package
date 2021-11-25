@@ -1,5 +1,5 @@
 import requests
-from services.methods.constants.url import Url
+from task.scripts.constants.url import Url
 
 """
 Starts a task and returns the token for it.
