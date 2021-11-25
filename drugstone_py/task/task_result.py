@@ -1,10 +1,9 @@
 import json
 import os
-import random
 import pandas as pd
 from pathlib import Path
-from pyvis.network import Network
 from task.scripts.normalize_nodes import normalize_nodes
+from task.scripts.download_network_graph import download_network_graph
 
 
 class TaskResult:
@@ -95,37 +94,4 @@ class TaskResult:
 
     def to_graph(self) -> None:
         """Downloads a graph of the nodes in a html file."""
-
-        # The network.
-        net = Network(height='90%', width='100%')
-
-        # Adds the nodes to the network with a random color.
-        for n in [*self.nodes]:
-            hex_color = ["#"+''.join([random.choice('ABCDEF0123456789') for _ in range(6)])]
-            net.add_node(n, color=hex_color[0])
-
-        # Adds the edges to the network.
-        edges = []
-        for n in self.nodes:
-            for e in self.nodes[n]["edges"]:
-                edges.append((e["from"], e["to"]))
-        net.add_edges(edges)
-
-        # net.show_buttons(filter_=['physics'])
-        net.set_edge_smooth("cubicBezier")
-        net.set_options("""
-        var options = {
-            "physics": {
-                "barnesHut": {
-                "gravitationalConstant": -2000,
-                "centralGravity": 0,
-                "springLength": 20,
-                "springConstant": 0.005,
-                "avoidOverlap": 1
-                },
-                "minVelocity": 0.75
-            }
-        }
-        """)
-        # net.toggle_physics(False)
-        net.show(str(Path.home() / "Downloads/graph.html"))
+        download_network_graph(self.nodes)
