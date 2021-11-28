@@ -1,20 +1,17 @@
 from task.task import Task
-from task.scripts.constants.task_parameter import TaskParameter
+from task.scripts.initiate_new_task import initiate_new_task
 
 
 class Drugstone:
     """The starting point of the Drugstone package.
 
     Create a Drugstone Object to start tasks with it.
-    
-    For example: 
-    ds = Drugstone()
-    task = ds.new_task(["BRCA1", "BRCA2"])
 
-    Attributes
-    ----------
-    __number_of_tasks : int
-        The number of tasks the Drugstone object has started.
+    For example:
+
+    ds = Drugstone()
+
+    task = ds.new_task(["BRCA1", "BRCA2"])
 
     Methods
     -------
@@ -45,12 +42,7 @@ class Drugstone:
             Default is an empty string.
         """
 
-        t = Task()
         name = name if name != "" else "Task" + str(self.__number_of_tasks)
-        t.initiate_new_task(seeds, params, name)
+        token = initiate_new_task(seeds=seeds, params=params)
+        t = Task(name=name, token=token)
         return t
-
-    @staticmethod
-    def get_task_parameters() -> TaskParameter:
-        """Returns an TaskParameter object."""
-        return TaskParameter()
