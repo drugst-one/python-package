@@ -1,4 +1,3 @@
-import random
 from pyvis.network import Network
 from pathlib import Path
 

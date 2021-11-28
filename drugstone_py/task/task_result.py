@@ -1,7 +1,7 @@
 import json
 import os
-import pandas as pd
 from pathlib import Path
+from pandas.core.frame import DataFrame
 from task.scripts.normalize_nodes import normalize_nodes
 from task.scripts.download_network_graph import download_network_graph
 
@@ -43,11 +43,8 @@ class TaskResult:
         with open(downloads_path, "x") as f:
             json.dump(self.nodes, f, indent=4)
 
-    def to_csv(self) -> None:
-        # downloads_path = self.path_to_download_folder + "test.csv"
-        downloads_path = str(Path.home() / "Downloads/results.csv")
-        df = pd.DataFrame(self.nodes).T
-        df.to_csv(downloads_path)
+    def to_pandas_dataframe(self) -> DataFrame:
+        return DataFrame(self.nodes).T
 
     def proteins_to_csv(self) -> None:
         downloads_path = str(Path.home() / "Downloads/proteins.csv")
@@ -55,7 +52,7 @@ class TaskResult:
         for name, detail in self.nodes.items():
             if detail["node_type"] == "protein":
                 data[name] = detail
-        df = pd.DataFrame(data).T
+        df = DataFrame(data).T
         df.to_csv(downloads_path)
 
     def drugs_to_csv(self) -> None:
@@ -64,7 +61,7 @@ class TaskResult:
         for name, detail in self.nodes.items():
             if detail["node_type"] == "drug":
                 data[name] = detail
-        df = pd.DataFrame(data).T
+        df = DataFrame(data).T
         df.to_csv(downloads_path)
 
     def edges_to_csv(self) -> None:
@@ -82,33 +79,8 @@ class TaskResult:
             for e in [*self.nodes]:
                 data[n][e] = 1 if [n, e] in edges or [e, n] in edges else 0
 
-        df = pd.DataFrame(data)
+        df = DataFrame(data)
         df.to_csv(downloads_path)
-
-    def to_excel(self):
-        # downloads_path = self.path_to_download_folder + "test.csv"
-        downloads_path = str(Path.home() / "Downloads/results.xlsx")
-        df = pd.DataFrame(self.nodes).T
-        df.to_excel(downloads_path)
-
-    def edges_to_excel(self):
-        data = {}
-        # downloads_path = self.path_to_download_folder + "edges.xlsx"
-        downloads_path = str(Path.home() / "Downloads/edges1.xlsx")
-        
-        def is_edge(start: str, end: str):
-            for e in self.nodes[start]["edges"]:
-                if e["to"] == end:
-                    return 1
-            return 0
-
-        for node in [*self.nodes]:
-            data[node] = {}
-            for n in [*self.nodes]:
-                data[node][n] = is_edge(node, n)
-        
-        df = pd.DataFrame(data).T
-        df.to_excel(downloads_path)
 
     def to_graph(self) -> None:
         """Downloads a graph of the nodes in a html file."""

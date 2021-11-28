@@ -17,8 +17,8 @@ class Task:
 
     def __init__(self) -> None:
         # The token and the task_name are assigned by the start_task function.
-        self.__token: str
-        self.task_name: str
+        self.__token: str = ""
+        self.task_name: str = ""
 
     def initiate_new_task(self, seeds: list, params: dict, name: str):
         """
@@ -54,8 +54,9 @@ class Task:
                 Url.TASK + "?token=" + self.__token,
                 verify=False).json()["info"]
 
-    def get_progress(self) -> float:
-        return self.get_info()["progress"]
+    def get_progress(self) -> str:
+        f_progress = int(self.get_info()["progress"]) * 100
+        return str(f_progress) + "%"
 
     def get_status(self) -> str:
         return self.get_info()["status"]
@@ -75,25 +76,17 @@ class Task:
             return True
         elif self.is_failed():
             warnings.warn(self.task_name + " has failed!")
-            return False
+        return False
 
     def get_result(self) -> TaskResult:
-        if self.is_done():
+        if self.wait_for_task_to_finish():
             url_parameter = "?view=&fmt=&token=" + self.__token
             task_result_response = requests.get(
                         Url.TASK_RESULTS + url_parameter, 
                         verify=False
                         )
             return TaskResult(task_result_response.json())
-        elif self.is_failed():
-            logging.warning(self.task_name + " has failed!")
         else:
-            logging.warning(
-                self.task_name + 
-                """ was not done! 
-                Could not return the result dictionary! 
-                Wait for the task to finish!"""
-                )
             return {}
 
     @staticmethod
@@ -106,7 +99,7 @@ class Task:
             "parameters": {
                 "target": "drug",
                 "ppi_dataset": "STRING", 
-                "pdi_dataset": "drugbank", 
+                "pdi_dataset": "drugbank",
                 "config": {"identifier": "symbol"},
             }
         }
@@ -124,6 +117,9 @@ class Task:
             else:
                 normalized_params["parameters"][key] = value
 
+        if (normalized_params["algorithm"] == "keypathwayminer"
+                and "k" not in normalized_params["parameters"]):
+            normalized_params["parameters"]["k"] = 5
         normalized_params["parameters"]["seeds"] = seeds
         normalized_params["parameters"]["input_network"] = {"nodes": [], "edges": []}
 
