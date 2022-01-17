@@ -1,17 +1,16 @@
 import json
 import os
-from pathlib import Path
 from pandas.core.frame import DataFrame
 from task.scripts.normalize_nodes import normalize_nodes
 from task.scripts.download_network_graph import download_network_graph
 
 
 class TaskResult:
-    
+
     def __init__(self, result: dict) -> None:
         self.__full_results = result
         self.__parameters = result["parameters"]
-        self.__nodes = normalize_nodes(result, self.__parameters)
+        self.__nodes = normalize_nodes(result)
 
     def to_dict(self) -> dict:
         """Returns a dict with the result."""
@@ -25,18 +24,17 @@ class TaskResult:
         """Returns the unfiltered results, as they come from the server."""
         return self.__full_results
 
-    def to_json(self):
-        """Downloads a json file with the results to the users downloads folder."""
+    def to_json(self, path: str, name: str = "result"):
+        """Downloads a json file with the results to the given folder."""
 
-        # FIXME: Update the path for windows pcs
-        downloads_path = str(Path.home() / "Downloads/result.json")
+        downloads_path = path + name + ".json"
         path_exists = os.path.exists(downloads_path)
         iterations = 1
         while path_exists:
             if not downloads_path.endswith(").json"):
-                downloads_path = downloads_path[:len(downloads_path)-5] + "(1).json"
+                downloads_path = downloads_path[:len(downloads_path) - 5] + "(1).json"
             else:
-                downloads_path = downloads_path[:len(downloads_path)-7] + str(iterations) + ").json"
+                downloads_path = downloads_path[:len(downloads_path) - 7] + str(iterations) + ").json"
                 iterations = iterations + 1
             path_exists = os.path.exists(downloads_path)
 
@@ -46,26 +44,21 @@ class TaskResult:
     def to_pandas_dataframe(self) -> DataFrame:
         return DataFrame(self.__nodes).T
 
-    def proteins_to_csv(self) -> None:
-        downloads_path = str(Path.home() / "Downloads/proteins.csv")
-        data = {}
-        for name, detail in self.__nodes.items():
-            if detail["node_type"] == "protein":
-                data[name] = detail
-        df = DataFrame(data).T
-        df.to_csv(downloads_path)
+    def proteins_to_csv(self, path: str, name: str = "proteins") -> None:
+        downloads_path = path + name + ".csv"
+        df = DataFrame(self.__nodes["genes"]).T
+        df.sort_values(by="score", ascending=False).to_csv(downloads_path)
 
-    def drugs_to_csv(self) -> None:
-        downloads_path = str(Path.home() / "Downloads/drugs.csv")
-        data = {}
-        for name, detail in self.__nodes.items():
-            if detail["node_type"] == "drug":
-                data[name] = detail
-        df = DataFrame(data).T
-        df.to_csv(downloads_path)
+    def drugs_to_csv(self, path: str, name: str = "drugs") -> None:
+        downloads_path = path + name + ".csv"
+        df = DataFrame(self.__nodes["drugs"]).T
+        if df.empty:
+            df.to_csv(downloads_path)
+        else:
+            df.sort_values(by="score", ascending=False).to_csv(downloads_path)
 
-    def edges_to_csv(self) -> None:
-        downloads_path = str(Path.home() / "Downloads/edges.csv")
+    def edges_to_csv(self, path: str, name: str = "edges") -> None:
+        downloads_path = path + name + ".csv"
 
         edges = []
         for n in [*self.__nodes]:
@@ -81,6 +74,6 @@ class TaskResult:
         df = DataFrame(data)
         df.to_csv(downloads_path)
 
-    def to_graph(self) -> None:
+    def to_graph(self, path: str, name: str = "graph") -> None:
         """Downloads a graph of the nodes in a html file."""
-        download_network_graph(self.__nodes)
+        download_network_graph(self.__nodes, path=path, name=name)

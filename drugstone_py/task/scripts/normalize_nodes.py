@@ -1,62 +1,95 @@
 
-
-def normalize_nodes(results: dict, parameters: dict) -> dict:
-    """Returns a normalized dict of the nodes, with their details.
+def normalize_nodes(results: dict) -> dict:
+    """Returns a normalized dict of the drugs and genes.
 
     Parameters
     ----------
     results
-    parameters
     """
 
+    drugs = {}
+    genes = {}
+
+    # For all the nodes in the results,
+    # differentiates if it's a drug or gene
+    # and puts it in the according dict.
     nodes = results["nodeAttributes"]["details"]
     node_types = results["nodeAttributes"]["nodeTypes"]
+    for n_id, n_type in node_types.items():
+        nodes[n_id]["node_type"] = n_type
+    for _, node in nodes.items():
+        if node["node_type"] == "drug":
+            n_name = node["label"]
+            drugs[n_name] = node
+        elif node["node_type"] == "protein":
+            n_name = node["symbol"]
+            genes[n_name] = node
+
+    # Adds to the genes if it's a seed or not.
     is_seed = results["nodeAttributes"]["isSeed"]
-    node_ids = results["network"]["nodes"]
+    for _, g_details in genes.items():
+        g_details["is_seed"] = is_seed[g_details["netexId"]]
+
+    # Normalizes the scores for the drugs.
+    drug_scores = []
+    for _, drug in drugs.items():
+        if "score" in drug:
+            drug_scores.append(drug["score"])
+    max_drug_score = max([x for x in drug_scores if x is not None])
+    for _, drug in drugs.items():
+        if "score" in drug and (type(drug["score"]) == int
+                                or type(drug["score"]) == float):
+            old_score = drug["score"]
+            new_score = round(old_score / max_drug_score, 4)
+            drug["score"] = new_score
+        else:
+            drug["score"] = None
+
+    # Normalizes the scores for the genes.
+    gene_scores = []
+    for _, gene in genes.items():
+        if "score" in gene:
+            gene_scores.append(gene["score"])
+    max_gene_score = max([x for x in gene_scores if x is not None])
+    for _, gene in genes.items():
+        if "score" in gene and (type(gene["score"]) == int
+                                or type(gene["score"]) == float):
+            old_score = gene["score"]
+            new_score = round(old_score / max_gene_score, 4)
+            gene["score"] = new_score
+        else:
+            drug["score"] = None
+
+    # Adds the edges to the genes.
     edges = results["network"]["edges"]
-
-    has_score = False
-    scores = []
-    max_score = None
-    if "scores" in results["nodeAttributes"]:
-        has_score = True
-        scores = results["nodeAttributes"]["scores"]
-        max_score = max([x for x in list(scores.values()) if x is not None])
-
-    # Iterates the edges and replaces the netexId with the common name.
-    for edge in edges:
-        old_from = edge["from"]
-        old_to = edge["to"]
-        if str(old_from).startswith("p"):
-            edge["from"] = nodes[old_from]["symbol"]
-        elif str(old_from).startswith("d"):
-            edge["from"] = nodes[old_from]["label"]
-        if str(old_to).startswith("p"):
-            edge["to"] = nodes[old_to]["symbol"]
-        elif str(old_to).startswith("d"):
-            edge["to"] = nodes[old_to]["label"]
-
-    for node_id in nodes:
-        nodes[node_id]["node_type"] = node_types.get(node_id)
-        nodes[node_id]["is_seed"] = is_seed.get(node_id)
-        nodes[node_id].pop("netexId")
-        nodes[node_id]["edges"] = []
-        if has_score:
-            if scores[node_id] is not None:
-                full_score = scores[node_id] / max_score
-                nodes[node_id]["score"] = round(full_score, 4)
+    for _, gene in genes.items():
+        edges_dict = [x for x in edges if x["from"] == gene["netexId"]]
+        edges_netex_id = []
+        edges_normalized = []
+        for e in edges_dict:
+            edges_netex_id.append(e["to"])
+        for e in edges_netex_id:
+            if str(e).startswith("p"):
+                for _, g in genes.items():
+                    if e == g["netexId"]:
+                        edges_normalized.append(g["symbol"])
+            elif str(e).startswith("d"):
+                for _, d in drugs.items():
+                    if e == d["netexId"]:
+                        edges_normalized.append(d["label"])
             else:
-                nodes[node_id]["score"] = None
-        for edge in edges:
-            if ((str(node_id).startswith("p") and edge["from"] == nodes[node_id]["symbol"]) or
-            (str(node_id).startswith("d") and edge["from"] == nodes[node_id]["label"])):
-                nodes[node_id]["edges"].append(edge)
+                edges_normalized.append(e)
+        gene["has_edges_to"] = edges_normalized
 
-    for i in node_ids:
-        if str(i).startswith("p"):
-            node_name = nodes[i]["symbol"]
-        elif str(i).startswith("d"):
-            node_name = nodes[i]["label"]
-        nodes[node_name] = nodes.pop(i)
+    # Removes unnecessary properties from drugs.
+    for _, drug in drugs.items():
+        drug.pop("netexId")
+        drug.pop("trialLinks")
+        drug.pop("node_type")
 
-    return nodes
+    # Removes unnecessary properties from genes.
+    for _, gene in genes.items():
+        gene.pop("netexId")
+        gene.pop("node_type")
+
+    return {"drugs": drugs, "genes": genes}
