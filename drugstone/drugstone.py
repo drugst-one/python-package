@@ -1,5 +1,10 @@
+import urllib3
+import logging
 from task.task import Task
 from task.scripts.initiate_new_task import initiate_new_task
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+logging.getLogger().setLevel(logging.INFO)
 
 
 class Drugstone:
@@ -17,8 +22,6 @@ class Drugstone:
     -------
     new_task(seeds: list, params:dict = {}, name:str = "") : Task
         Returns a task object with the running task.
-    get_task_parameters() : TaskParameter
-        Returns an TaskParameter object.
     """
 
     __number_of_tasks: int = 1
@@ -43,6 +46,7 @@ class Drugstone:
         """
 
         name = name if name != "" else "Task" + str(self.__number_of_tasks)
+        self.__number_of_tasks += 1
         token = initiate_new_task(seeds=seeds, params=params)
         t = Task(name=name, token=token)
         return t

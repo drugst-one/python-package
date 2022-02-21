@@ -1,4 +1,3 @@
-
 def normalize_nodes(results: dict) -> dict:
     """Returns a normalized dict of the drugs and genes.
 
@@ -35,7 +34,8 @@ def normalize_nodes(results: dict) -> dict:
     for _, drug in drugs.items():
         if "score" in drug:
             drug_scores.append(drug["score"])
-    max_drug_score = max([x for x in drug_scores if x is not None])
+    if drug_scores:
+        max_drug_score = max([x for x in drug_scores if x is not None])
     for _, drug in drugs.items():
         if "score" in drug and (type(drug["score"]) == int
                                 or type(drug["score"]) == float):
@@ -50,7 +50,8 @@ def normalize_nodes(results: dict) -> dict:
     for _, gene in genes.items():
         if "score" in gene:
             gene_scores.append(gene["score"])
-    max_gene_score = max([x for x in gene_scores if x is not None])
+    if gene_scores:
+        max_gene_score = max([x for x in gene_scores if x is not None])
     for _, gene in genes.items():
         if "score" in gene and (type(gene["score"]) == int
                                 or type(gene["score"]) == float):
@@ -58,7 +59,7 @@ def normalize_nodes(results: dict) -> dict:
             new_score = round(old_score / max_gene_score, 4)
             gene["score"] = new_score
         else:
-            drug["score"] = None
+            gene["score"] = None
 
     # Adds the edges to the genes.
     edges = results["network"]["edges"]

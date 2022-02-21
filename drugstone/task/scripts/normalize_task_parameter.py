@@ -12,16 +12,17 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
             "target": "drug",
             "ppi_dataset": "STRING",
             "pdi_dataset": "drugbank",
+            "result_size": 20,
             "config": {"identifier": "symbol"},
         }
     }
 
     for key, value in user_params.items():
         if key == "algorithm" and hasattr(TaskParameter.AlgorithmValues, str(value).upper()):
-            normalized_params[key] = value
+            normalized_params["algorithm"] = value
         elif key == "target" and hasattr(TaskParameter.TargetValues, str(value).upper()):
-            normalized_params[key] = value
-            normalized_params["parameters"][key] = value
+            normalized_params["target"] = value
+            normalized_params["parameters"]["target"] = value
         elif key == "identifier" and hasattr(TaskParameter.IdentifierValues, str(value).upper()):
             normalized_params["parameters"]["config"]["identifier"] = value
         elif key == "config" and type(value) is dict and type(dict(value).get("identifier", None)) is str:

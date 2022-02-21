@@ -1,6 +1,7 @@
 import json
 import os
 from pandas.core.frame import DataFrame
+from task.scripts.check_result_size import check_result_size
 from task.scripts.normalize_nodes import normalize_nodes
 from task.scripts.download_network_graph import download_network_graph
 
@@ -10,7 +11,10 @@ class TaskResult:
     def __init__(self, result: dict) -> None:
         self.__full_results = result
         self.__parameters = result["parameters"]
-        self.__nodes = normalize_nodes(result)
+        self.__nodes = check_result_size(
+            nodes=normalize_nodes(result),
+            parameters=self.__parameters
+        )
 
     def to_dict(self) -> dict:
         """Returns a dict with the result."""
@@ -75,5 +79,5 @@ class TaskResult:
         df.to_csv(downloads_path)
 
     def to_graph(self, path: str, name: str = "graph") -> None:
-        """Downloads a graph of the nodes in a html file."""
+        """Downloads a graph of the nodes, in a html file."""
         download_network_graph(self.__nodes, path=path, name=name)

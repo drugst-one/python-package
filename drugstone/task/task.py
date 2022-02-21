@@ -1,13 +1,9 @@
 import requests
 import time
-import urllib3
 import logging
 import warnings
 from task.scripts.constants.url import Url
 from task.task_result import TaskResult
-
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-logging.getLogger().setLevel(logging.INFO)
 
 
 class Task:
@@ -19,11 +15,13 @@ class Task:
     def get_result(self) -> TaskResult:
         if self.__wait_for_task_to_finish():
             url_parameter = "?view=&fmt=&token=" + self.__token
-            task_result_response = requests.get(
+            response = requests.get(
                         Url.TASK_RESULTS + url_parameter,
                         verify=False
-                        )
-            return TaskResult(task_result_response.json())
+                        ).json()
+            algorithm = self.get_info()["algorithm"]
+            response["parameters"]["algorithm"] = algorithm
+            return TaskResult(response)
         else:
             # TODO: add returning empty TaskResult
             return {}
