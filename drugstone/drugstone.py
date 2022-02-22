@@ -1,6 +1,7 @@
 import urllib3
 import logging
 from task.task import Task
+from task.scripts.make_upsetplot import make_upset_plot
 from task.scripts.initiate_new_task import initiate_new_task
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -50,3 +51,6 @@ class Drugstone:
         token = initiate_new_task(seeds=seeds, params=params)
         t = Task(name=name, token=token)
         return t
+
+    def create_upsetplot(self):
+        make_upset_plot()
