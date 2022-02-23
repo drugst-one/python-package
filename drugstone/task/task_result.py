@@ -20,6 +20,14 @@ class TaskResult:
         """Returns a dict with the result."""
         return self.__nodes
 
+    def get_genes(self) -> dict:
+        """Returns a dict with the genes."""
+        return self.__nodes["genes"]
+
+    def get_drugs(self) -> dict:
+        """Returns a dict with the drugs."""
+        return self.__nodes["drugs"]
+
     def get_parameters(self) -> dict:
         """Returns a dict with the parameters of the task."""
         return self.__parameters

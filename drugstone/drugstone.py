@@ -52,5 +52,36 @@ class Drugstone:
         t = Task(name=name, token=token)
         return t
 
+    def deep_search(self, seeds: list, params: dict = dict({}), name: str = "") -> Task:
+        # target search
+        t_search_name = self.__create_deep_search_name_for("target", name)
+        t_search_params = self.__create_deep_search_parameters_for("drug-target", params)
+        t_search = self.new_task(seeds, t_search_params, t_search_name)
+        t_search_results = t_search.get_result()
+        targets = t_search_results.get_genes()
+
+        # drug search
+        d_search_name = self.__create_deep_search_name_for("drug", name)
+        d_search_params = self.__create_deep_search_parameters_for("drug", params)
+        d_search = self.new_task(list(targets.keys()), d_search_params, d_search_name)
+        return d_search
+
     def create_upsetplot(self):
         make_upset_plot()
+
+    def __create_deep_search_parameters_for(self, target: str, params: dict) -> dict:
+        params["target"] = target
+        if target == "drug-target" and "target_search" in params:
+            params["algorithm"] = params["target_search"]
+        elif target == "drug" and "drug_search" in params:
+            params["algorithm"] = params["drug_search"]
+        else:
+            params["algorithm"] = "trustrank"
+        return params
+
+    def __create_deep_search_name_for(self, target: str, name: str) -> str:
+        if name == "":
+            new_name = " DeepSearch-" + target + " " + str(self.__number_of_tasks)
+        else:
+            new_name = " " + name + "-" + target
+        return new_name
