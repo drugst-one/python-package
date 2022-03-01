@@ -1,7 +1,3 @@
-import json
-import logging
-
-
 def check_result_size(nodes: dict, parameters: dict) -> dict:
     target = parameters["target"]
     result_size = parameters["resultSize"]

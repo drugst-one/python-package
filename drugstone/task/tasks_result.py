@@ -1,6 +1,6 @@
 from task.task import Task
-from task.scripts.download_json import download_json
-from task.scripts.make_upsetplot import make_upset_plot
+from task.scripts.result_scripts.download_json import download_json
+from task.scripts.result_scripts.make_upsetplot import make_upset_plot
 
 
 class TasksResult:

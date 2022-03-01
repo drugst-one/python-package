@@ -1,6 +1,5 @@
 import warnings
 from typing import Dict
-# from task.scripts.constants.task_parameter import TaskParameter
 
 drug_target_search_values = ["multisteiner", "keypathwayminer", "trustrank",
                              "closeness", "degree", "betweenness"]

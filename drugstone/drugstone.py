@@ -3,8 +3,7 @@ import logging
 from typing import Union
 from task.task import Task
 from task.tasks import Tasks
-from task.task_result import TaskResult
-from task.scripts.initiate_new_task import initiate_new_task
+from task.scripts.task_scripts.initiate_new_task import initiate_new_task
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.getLogger().setLevel(logging.INFO)
@@ -45,8 +44,7 @@ class Drugstone:
             Default is an empty dict {}.
         """
         self.__number_of_tasks += 1
-        token = initiate_new_task(seeds, params)
-        return Task(token, self.__number_of_tasks)
+        return initiate_new_task(seeds, params, self.__number_of_tasks)
 
     def new_tasks(self, seeds: list, params: Union[dict, list[dict]] = dict({})) -> Tasks:
         if isinstance(params, dict):

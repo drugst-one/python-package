@@ -28,6 +28,7 @@ class TaskParameter:
 
     # Available options for the 'identifier' parameter.
     class IdentifierValues:
+        IDENTIFIER_VALUES = ["symbol", "uniprot", "ensg"]
         SYMBOL = "symbol"
         UNIPROT = "uniprot"
         ENSG = "ensg"
