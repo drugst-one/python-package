@@ -45,13 +45,20 @@ def normalize_nodes(results: dict) -> dict:
         else:
             drug["score"] = None
 
+    # sorts drugs without a score out
+    none_score_drugs = []
+    for drug, detail in drugs.items():
+        if detail["score"] is None:
+            none_score_drugs.append(drug)
+    for x in none_score_drugs:
+        drugs.pop(x)
+
     # Normalizes the scores for the genes.
-    gene_scores = []
+    gene_scores = [1]
     for _, gene in genes.items():
         if "score" in gene:
             gene_scores.append(gene["score"])
-    if gene_scores:
-        max_gene_score = max([x for x in gene_scores if x is not None])
+    max_gene_score = max([x for x in gene_scores if x is not None])
     for _, gene in genes.items():
         if "score" in gene and (type(gene["score"]) == int
                                 or type(gene["score"]) == float):

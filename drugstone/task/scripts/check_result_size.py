@@ -1,3 +1,4 @@
+import json
 import logging
 
 
@@ -22,10 +23,29 @@ def check_result_size(nodes: dict, parameters: dict) -> dict:
                 # the lowest scored drugs are wanted
                 sorted_drugs_list.reverse()
             resized_drugs = {}
-            for drug in sorted_drugs_list[0:result_size-1]:
+            for drug in sorted_drugs_list[0:result_size]:
                 label = drug["label"]
                 resized_drugs[label] = drug
-            return {"drugs": drugs, "genes": resized_drugs}
+            drug_filtered_genes = {}
+            for gene, detail in genes.items():
+                old_edges = detail["has_edges_to"]
+                new_edges = []
+                for edge in old_edges:
+                    if edge in resized_drugs.keys():
+                        new_edges.append(edge)
+                drug_filtered_genes[gene] = {
+                    **detail,
+                    "has_edges_to": new_edges
+                }
+            all_edges = []
+            for _, gene in drug_filtered_genes.items():
+                for e in gene["has_edges_to"]:
+                    all_edges.append(e)
+            filtered_genes = {}
+            for gene, detail in drug_filtered_genes.items():
+                if detail["is_seed"] or detail["has_edges_to"] or gene in all_edges:
+                    filtered_genes[gene] = detail
+            return {"drugs": resized_drugs, "genes": filtered_genes}
 
     if target == "drug-target":
         resized_genes = {}

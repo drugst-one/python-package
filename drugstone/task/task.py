@@ -2,59 +2,83 @@ import requests
 import time
 import logging
 import warnings
-from task.scripts.constants.url import Url
 from task.task_result import TaskResult
+from task.scripts.check_result_size import check_result_size
+from task.scripts.normalize_nodes import normalize_nodes
+from task.scripts.constants.url import Url
 
 
 class Task:
 
-    def __init__(self, name: str, token: str) -> None:
-        self.__task_name = name
+    def __init__(self, token: str, number: int = None) -> None:
+        # The order is important here!
         self.__token = token
+        self.__number = number
+        self.__info = self.__request_info()
+        self.__parameters = self.__create_parameters()
+        self.__wait_for_task_to_finish()
 
     def get_result(self) -> TaskResult:
-        if self.__wait_for_task_to_finish():
-            url_parameter = "?view=&fmt=&token=" + self.__token
-            response = requests.get(
-                        Url.TASK_RESULTS + url_parameter,
-                        verify=False
-                        ).json()
-            algorithm = self.get_info()["algorithm"]
-            response["parameters"]["algorithm"] = algorithm
-            return TaskResult(response)
+        if self.is_done():
+            result = self.__request__result()
+            result = normalize_nodes(result)
+            result = check_result_size(result, self.get_parameters())
+            return TaskResult(drugs=result["drugs"], genes=result["genes"])
         else:
-            # TODO: add returning empty TaskResult
-            return {}
+            return TaskResult()
 
     def get_info(self) -> dict:
-        if len(self.__token) == 0:
-            warnings.warn("No token. You have to start a task first.")
-            return {}
-        else: 
-            return requests.get(
-                Url.TASK + "?token=" + self.__token,
-                verify=False).json()["info"]
+        return self.__info
+
+    def get_parameters(self) -> dict:
+        return self.__parameters
+
+    def get_algorithm(self) -> str:
+        return self.__parameters["algorithm"]
 
     def get_progress(self) -> str:
-        f_progress = int(self.get_info()["progress"]) * 100
+        f_progress = int(self.__info["progress"]) * 100
         return str(f_progress) + "%"
 
     def get_status(self) -> str:
-        return self.get_info()["status"]
+        return self.__info["status"]
 
     def is_done(self) -> bool:
-        return self.get_info()["done"]
+        return self.__info["done"]
 
     def is_failed(self) -> bool:
-        return self.get_info()["failed"]
+        return self.__info["failed"]
+
+    def __request_info(self) -> dict:
+        return requests.get(
+                Url.TASK + "?token=" + self.__token,
+                verify=False).json()["info"]
+
+    def __request__result(self) -> dict:
+        url_parameter = "?view=&fmt=&token=" + self.__token
+        return requests.get(
+            Url.TASK_RESULTS + url_parameter,
+            verify=False
+        ).json()
+
+    def __create_parameters(self) -> dict:
+        t_alg = self.__info["algorithm"]
+        param = self.__info["parameters"]
+        param["algorithm"] = t_alg
+        param.pop("inputNetwork")
+        return param
 
     def __wait_for_task_to_finish(self) -> bool:
+        name = self.get_algorithm()
+        if self.__number is not None:
+            name += "-" + str(self.__number)
         while not self.is_done() and not self.is_failed():
-            time.sleep(1)
-            logging.info(self.__task_name + " progress is at: " + str(self.get_progress()))
+            logging.info(name + " progress is at: " + str(self.get_progress()))
+            time.sleep(2)
+            self.__info = self.__request_info()
         if self.is_done():
-            logging.info(self.__task_name + " is done.")
+            logging.info(name + " is done.")
             return True
         elif self.is_failed():
-            warnings.warn(self.__task_name + " has failed!")
+            warnings.warn(name + " has failed!")
         return False
