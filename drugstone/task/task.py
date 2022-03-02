@@ -1,3 +1,5 @@
+from task.drug import Drug
+from task.gene import Gene
 from task.task_result import TaskResult
 
 
@@ -13,10 +15,19 @@ class Task:
             self.__result = dict({"drugs": {}, "genes": {}})
         else:
             self.__result = result
+        # print(self.__result)
 
     @classmethod
-    def import_data(cls) -> "Task":
-        return cls()
+    def import_data(cls,
+                    drugs: list[Drug] = list([]),
+                    genes: list[Gene] = list([])) -> "Task":
+        r_drugs = {}
+        r_genes = {}
+        for drug in drugs:
+            r_drugs = {**r_drugs, **drug.to_dict()}
+        for gene in genes:
+            r_genes = {**r_genes, **gene.to_dict()}
+        return cls(result={"drugs": r_drugs, "genes": r_genes})
 
     def get_result(self) -> TaskResult:
         return TaskResult(drugs=self.__result["drugs"],
