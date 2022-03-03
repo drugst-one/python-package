@@ -1,8 +1,8 @@
 import requests
 import warnings
-from task.scripts.constants.url import Url
-from task.scripts.constants.task_parameter import TaskParameter
-from task.scripts.task_scripts.normalize_task_parameter import normalize_task_parameter
+from src.drugstone.task.scripts.constants.url import Url
+from src.drugstone.task.scripts.constants.task_parameter import TaskParameter
+from src.drugstone.task.scripts.task_scripts.normalize_task_parameter import normalize_task_parameter
 
 
 def map_nodes_to_internal_ids(

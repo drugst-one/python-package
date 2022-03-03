@@ -1,7 +1,7 @@
 import logging
 import warnings
 import time
-from task.scripts.network_scripts.request_task_info import request_task_info
+from src.drugstone.task.scripts.network_scripts.request_task_info import request_task_info
 
 
 def wait_for_task_to_finish(token: str, task_id: int = None) -> dict:

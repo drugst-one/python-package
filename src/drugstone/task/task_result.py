@@ -1,6 +1,6 @@
 from pandas.core.frame import DataFrame
-from task.scripts.result_scripts.download_json import download_json
-from task.scripts.result_scripts.download_network_graph import download_network_graph
+from src.drugstone.task.scripts.result_scripts.download_json import download_json
+from src.drugstone.task.scripts.result_scripts.download_network_graph import download_network_graph
 
 
 class TaskResult:

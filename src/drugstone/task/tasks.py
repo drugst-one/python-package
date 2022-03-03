@@ -1,6 +1,6 @@
-from task.task import Task
-from task.task_result import TaskResult
-from task.tasks_result import TasksResult
+from src.drugstone.task.task import Task
+from src.drugstone.task.task_result import TaskResult
+from src.drugstone.task.tasks_result import TasksResult
 
 
 class Tasks:

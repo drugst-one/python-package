@@ -1,9 +1,9 @@
-from task.task import Task
-from task.scripts.task_scripts.normalize_task_parameter import normalize_task_parameter
-from task.scripts.task_scripts.wait_for_task_to_finish import wait_for_task_to_finish
-from task.scripts.network_scripts.map_nodes_to_internal_ids import map_nodes_to_internal_ids
-from task.scripts.network_scripts.start_task import start_task
-from task.scripts.network_scripts.request_task_result import request_task_result
+from src.drugstone.task.task import Task
+from src.drugstone.task.scripts.task_scripts.normalize_task_parameter import normalize_task_parameter
+from src.drugstone.task.scripts.task_scripts.wait_for_task_to_finish import wait_for_task_to_finish
+from src.drugstone.task.scripts.network_scripts.map_nodes_to_internal_ids import map_nodes_to_internal_ids
+from src.drugstone.task.scripts.network_scripts.start_task import start_task
+from src.drugstone.task.scripts.network_scripts.request_task_result import request_task_result
 
 
 def initiate_new_task(seeds: list, user_params: dict, task_id: int = None) -> Task:

@@ -1,6 +1,6 @@
-from task.task import Task
-from task.scripts.result_scripts.download_json import download_json
-from task.scripts.result_scripts.make_upsetplot import make_upset_plot
+from src.drugstone.task.task import Task
+from src.drugstone.task.scripts.result_scripts.download_json import download_json
+from src.drugstone.task.scripts.result_scripts.make_upsetplot import make_upset_plot
 
 
 class TasksResult:
@@ -28,4 +28,4 @@ class TasksResult:
         download_json(data=self.to_dict(), path=path, name=name)
 
     def create_upsetplot(self):
-        make_upset_plot()
+        make_upset_plot(self.__tasks)

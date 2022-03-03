@@ -1,6 +1,6 @@
-from task.drug import Drug
-from task.gene import Gene
-from task.task_result import TaskResult
+from src.drugstone.task.drug import Drug
+from src.drugstone.task.gene import Gene
+from src.drugstone.task.task_result import TaskResult
 
 
 class Task:
@@ -15,7 +15,6 @@ class Task:
             self.__result = dict({"drugs": {}, "genes": {}})
         else:
             self.__result = result
-        # print(self.__result)
 
     @classmethod
     def import_data(cls,
