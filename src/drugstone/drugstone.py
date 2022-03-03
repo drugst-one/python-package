@@ -1,7 +1,8 @@
 import urllib3
 import logging
 from typing import Union
-from task.task import Task
+import task.task as t
+# from task.task import Task
 from task.tasks import Tasks
 from task.scripts.task_scripts.initiate_new_task import initiate_new_task
 
@@ -28,7 +29,7 @@ class Drugstone:
 
     __number_of_tasks: int = 0
 
-    def new_task(self, seeds: list, params: dict = dict({})) -> Task:
+    def new_task(self, seeds: list, params: dict = dict({})) -> t.Task:
         """Returns a task object with the running task.
         
         Initializes a new Task object 
@@ -68,7 +69,7 @@ class Drugstone:
             return Tasks(tasks)
         return Tasks([self.new_task(seeds, params)])
 
-    def deep_search(self, seeds: list, params: dict = dict({})) -> Task:
+    def deep_search(self, seeds: list, params: dict = dict({})) -> t.Task:
         # target search
         t_params = {**params, "target": "drug-target"}
         if "target_search" in params:
