@@ -2,7 +2,7 @@
 The python package for the https://drugst.one/ platform.
 
 ## Start a new task:
-    from drugstone import Drugstone
+    from drugstone.drugstone import Drugstone
 
     cf = [
             "CFTR", "TGFB1", "SCNN1B", 
@@ -29,7 +29,7 @@ There two ways of starting multiple tasks
 Starts a task for every algorithm in the list.
 The other parameters are the same for every task
 
-    from drugstone import Drugstone
+    from drugstone.drugstone import Drugstone
 
     cf = [
             "CFTR", "TGFB1", "SCNN1B", 
@@ -58,7 +58,7 @@ The other parameters are the same for every task
 Starts a task for every parameter in the list.
 The parameters are completely independent. 
 
-    from drugstone import Drugstone
+    from drugstone.drugstone import Drugstone
 
     cf = [
             "CFTR", "TGFB1", "SCNN1B", 
@@ -91,7 +91,7 @@ The parameters are completely independent.
 This will search for drug-targets for the seeds,
 and use the targets for a drug-search.
 
-    from drugstone import Drugstone
+    from drugstone.drugstone import Drugstone
 
     cf = [
             "CFTR", "TGFB1", "SCNN1B", 
@@ -118,10 +118,32 @@ and use the targets for a drug-search.
     r = t.get_result()                  
     r.download_json('download_path')
 
+## Import drug or gene data
+It is possible to import drug or gene data.
+- Visualize your data with TaskResult
+- combine or compare your data with drugstone results.
+
+
+    from drugstone.task.task import Task
+    from drugstone.task.drug import Drug
+    from drugstone.task.gene import Gene
+
+    d = [Drug(label="xy"),Drug(label="xyz"),Drug(label="uvw")]
+    g = [
+            Gene(symbol="ab",has_edges_to=["xy", "xyz", "uvw", "abc", "aab"]),
+            Gene(symbol="abc",has_edges_to=["xy", "uvw", "aab"]),
+            Gene(symbol="aab",has_edges_to=["xy"])
+        ]
+
+    imp_task = Task.import_data(drugs=d, genes=g)
+    r = imp_task.get_result()
+    r.download_json('download_path')
+    r.to_graph('download_path')
+
 ## create custom Tasks
 You can combine tasks in Tasks.
 
-    from task.tasks import Tasks
+    from drugstone.task.tasks import Tasks
 
     t_s = [t1, t2, t3] # list of Task objects 
     tasks = Tasks(t_s)
