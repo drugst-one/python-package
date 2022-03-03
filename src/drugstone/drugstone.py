@@ -1,9 +1,9 @@
 import urllib3
 import logging
 from typing import Union
-from src.drugstone.task.task import Task
-from src.drugstone.task.tasks import Tasks
-from src.drugstone.task.scripts.task_scripts.initiate_new_task import initiate_new_task
+from task.task import Task
+from task.tasks import Tasks
+from task.scripts.task_scripts.initiate_new_task import initiate_new_task
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.getLogger().setLevel(logging.INFO)
