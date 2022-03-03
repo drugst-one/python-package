@@ -1,9 +1,10 @@
 import urllib3
 import logging
 from typing import Union
-import task.task as t
+import task.task as tsk
 # from task.task import Task
-from task.tasks import Tasks
+import task.tasks as tsks
+# from task.tasks import Tasks
 from task.scripts.task_scripts.initiate_new_task import initiate_new_task
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -29,7 +30,7 @@ class Drugstone:
 
     __number_of_tasks: int = 0
 
-    def new_task(self, seeds: list, params: dict = dict({})) -> t.Task:
+    def new_task(self, seeds: list, params: dict = dict({})) -> tsk.Task:
         """Returns a task object with the running task.
         
         Initializes a new Task object 
@@ -47,7 +48,7 @@ class Drugstone:
         self.__number_of_tasks += 1
         return initiate_new_task(seeds, params, self.__number_of_tasks)
 
-    def new_tasks(self, seeds: list, params: Union[dict, list[dict]] = dict({})) -> Tasks:
+    def new_tasks(self, seeds: list, params: Union[dict, list[dict]] = dict({})) -> tsks.Tasks:
         if isinstance(params, dict):
             algorithm = "algorithm"
             if "algorithm" in params:
@@ -60,16 +61,16 @@ class Drugstone:
                     t_param = {**params, "algorithm": alg}
                     t = self.new_task(seeds, t_param)
                     tasks.append(t)
-                return Tasks(tasks)
+                return tsks.Tasks(tasks)
         elif isinstance(params, list):
             tasks = []
             for p in params:
                 t = self.new_task(seeds, p)
                 tasks.append(t)
-            return Tasks(tasks)
-        return Tasks([self.new_task(seeds, params)])
+            return tsks.Tasks(tasks)
+        return tsks.Tasks([self.new_task(seeds, params)])
 
-    def deep_search(self, seeds: list, params: dict = dict({})) -> t.Task:
+    def deep_search(self, seeds: list, params: dict = dict({})) -> tsk.Task:
         # target search
         t_params = {**params, "target": "drug-target"}
         if "target_search" in params:
