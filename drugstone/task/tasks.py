@@ -1,11 +1,12 @@
-from src.drugstone.task.task import Task
-from src.drugstone.task.task_result import TaskResult
-from src.drugstone.task.tasks_result import TasksResult
+from typing import List
+from .task import Task
+from .task_result import TaskResult
+from .tasks_result import TasksResult
 
 
 class Tasks:
 
-    def __init__(self, tasks: list[Task] = []) -> None:
+    def __init__(self, tasks: List[Task] = []) -> None:
         self.__tasks = tasks
 
     def get_result(self) -> TasksResult:

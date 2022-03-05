@@ -1,12 +1,15 @@
+from typing import List
+
+
 class Gene:
 
     def __init__(self,
                  symbol: str = None,
                  protein_name: str = None,
-                 has_edges_to: list[str] = None,
+                 has_edges_to: List[str] = None,
                  uniprot_ac: str = None,
                  entrez: str = None,
-                 ensg: list[str] = None):
+                 ensg: List[str] = None):
         self.__symbol = symbol
         self.__protein_name = protein_name
         self.__uniprot_ac = uniprot_ac

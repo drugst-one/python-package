@@ -1,6 +1,7 @@
-from src.drugstone.task.drug import Drug
-from src.drugstone.task.gene import Gene
-from src.drugstone.task.task_result import TaskResult
+from typing import List
+from .models.drug import Drug
+from .models.gene import Gene
+from .task_result import TaskResult
 
 
 class Task:
@@ -18,8 +19,8 @@ class Task:
 
     @classmethod
     def import_data(cls,
-                    drugs: list[Drug] = list([]),
-                    genes: list[Gene] = list([])) -> "Task":
+                    drugs: List[Drug] = list([]),
+                    genes: List[Gene] = list([])) -> "Task":
         r_drugs = {}
         r_genes = {}
         for drug in drugs:

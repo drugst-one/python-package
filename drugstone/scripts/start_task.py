@@ -1,5 +1,5 @@
 import requests
-from src.drugstone.task.scripts.constants.url import Url
+from .constants.url import Url
 
 
 def start_task(params: dict) -> str:

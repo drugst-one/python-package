@@ -1,7 +1,7 @@
 import requests
-from src.drugstone.task.scripts.constants.url import Url
-from src.drugstone.task.scripts.task_scripts.check_result_size import check_result_size
-from src.drugstone.task.scripts.task_scripts.normalize_nodes import normalize_nodes
+from .constants.url import Url
+from .check_result_size import check_result_size
+from .normalize_nodes import normalize_nodes
 
 
 def request_task_result(token: str, params: dict) -> dict:

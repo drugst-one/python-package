@@ -1,5 +1,6 @@
 import warnings
 from typing import Dict
+from .task_id import TaskId
 
 drug_target_search_values = ["multisteiner", "keypathwayminer", "trustrank",
                              "closeness", "degree", "betweenness"]
@@ -80,5 +81,7 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
         normalized_params["algorithm"] = "trustrank"
     normalized_params["parameters"]["seeds"] = seeds
     normalized_params["parameters"]["input_network"] = {"nodes": [], "edges": []}
+    alg = normalized_params["algorithm"]
+    normalized_params["parameters"]["task_id"] = TaskId.get(alg, 4)
 
     return normalized_params
