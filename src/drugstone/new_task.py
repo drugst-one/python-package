@@ -1,8 +1,7 @@
 """
-drugstone.api
-~~~~~~~~~~~~~
+drugstone.new_task
 
-This module implements the new_task method for the drugstone API.
+This module implements the new_task function for the drugstone API.
 
 :copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
 :author: Ugur Turhan
@@ -17,18 +16,16 @@ from .scripts.request_task_result import request_task_result
 
 
 def new_task(seeds: list, parameters: dict = dict({})) -> Task:
-    """Returns a Task object with the running task.
+    """Starts a task.
 
-    Starts a task according to the user given seeds and parameters.
-    Returns a Task object, representing the task.
+    Starts a task, according to the user given seeds and parameters.
+    Returns a :class:`Task` object, representing the task.
 
     :param list seeds: List of seed nodes for the task.
-    :param dict parameters: (optional) Dictionary of parameters for the task.
-        Defaults to an empty dict {}.
-
+    :param dict parameters: (optional) Dictionary of parameters for the task. Defaults to an empty dict {}.
     :return: :class:`Task` object
-    :rtype: Task
     """
+
     internal_ids = map_nodes_to_internal_ids(seeds, parameters)
     normalized_params = normalize_task_parameter(parameters, internal_ids)
     token = start_task(normalized_params)

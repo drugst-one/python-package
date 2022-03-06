@@ -1,3 +1,12 @@
+"""
+drugstone.task.models.gene
+
+This module implements the class Gene for the drugstone API.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
 from typing import List
 
 
@@ -17,7 +26,8 @@ class Gene:
         self.__ensg = ensg
         if has_edges_to is None:
             self.__has_edges_to = []
-        else: self.__has_edges_to = has_edges_to
+        else:
+            self.__has_edges_to = has_edges_to
 
     def to_dict(self):
         return {

@@ -1,9 +1,18 @@
+"""
+drugstone.task.scripts.download_network_graph
+
+This module implements the download_network_graph function.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
 from pyvis.network import Network
 from .create_path import create_path
 
 
 def download_network_graph(nodes: dict, path: str = "", name: str = "graph") -> None:
-    """Downloads a graph of the nodes in a html file."""
+    """Downloads a html file with a graph of the nodes."""
 
     # The network.
     net = Network(height='90%', width='100%')

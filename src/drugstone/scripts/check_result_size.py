@@ -1,10 +1,30 @@
-def check_result_size(nodes: dict, parameters: dict) -> dict:
+"""
+drugstone.scripts.check_result_size
+
+This module implements the check_result_size function.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
+
+def check_result_size(result: dict, parameters: dict) -> dict:
+    """Returns the results according to the result_size.
+
+    Only edits the targeted results,
+    e.g. for a drug-search, only the drugs will be edited.
+
+    :param dict result: Dictionary of the result.
+    :param dict parameters: Dictionary of the task parameters.
+    :return: Dictionary of the results, according to the result_size.
+    """
+
     target = parameters["target"]
     result_size = parameters["resultSize"]
     algorithm = ["algorithm"]
 
-    drugs = nodes["drugs"]
-    genes = nodes["genes"]
+    drugs = result["drugs"]
+    genes = result["genes"]
 
     if target == "drug":
         if len(drugs) <= result_size:

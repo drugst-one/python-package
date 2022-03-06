@@ -1,8 +1,18 @@
+"""
+drugstone.task.scripts.make_upsetplot
+
+This module implements the make_upset_plot function.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
 from upsetplot import from_contents, plot
 from matplotlib import pyplot
 
 
 def make_upset_plot(tasks: dict):
+    """Opens a new window with an upset-plot of the results."""
 
     data = {}
     for t in tasks:

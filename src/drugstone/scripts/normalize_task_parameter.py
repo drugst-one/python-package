@@ -1,14 +1,17 @@
+"""
+drugstone.scripts.normalize_task_parameter
+
+This module implements the normalize_task_parameter function.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
+
 import warnings
 from typing import Dict
 from .task_id import TaskId
-
-drug_target_search_values = ["multisteiner", "keypathwayminer", "trustrank",
-                             "closeness", "degree", "betweenness"]
-drug_search_values = ["trustrank", "closeness", "degree", "proximity"]
-target_values = ["drug", "drug-target"]
-identifier_values = ["symbol", "uniprot", "ensg"]
-ppi_values = ["STRING", "BioGRID", "APID"]
-pdi_values = ["drugbank", "chembl", "dgidb"]
+from .constants.task_parameter import TaskParameter
 
 
 def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
@@ -28,14 +31,14 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
 
     for key, value in user_params.items():
         if key == "algorithm":
-            if value in drug_target_search_values or value in drug_search_values:
+            if value in TaskParameter.AlgorithmValues.ALGORITHM_VALUES:
                 normalized_params["algorithm"] = value
             else:
                 warnings.warn(str(value) + "-algorithm is not known to Drugstone!"
                               + " The algorithm is changed to "
                               + normalized_params["algorithm"] + "!    ")
         elif key == "target":
-            if value in target_values:
+            if value in TaskParameter.TargetValues.TARGET_VALUES:
                 normalized_params["target"] = value
                 normalized_params["parameters"]["target"] = value
             else:
@@ -43,21 +46,21 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
                               + " The target is changed to "
                               + normalized_params["target"] + "!    ")
         elif key == "identifier":
-            if value in identifier_values:
+            if value in TaskParameter.IdentifierValues.IDENTIFIER_VALUES:
                 normalized_params["parameters"]["config"]["identifier"] = value
             else:
                 warnings.warn("The identifier: " + str(value) + " is not known to Drugstone!"
                               + " The identifier is changed to "
                               + normalized_params["parameters"]["config"]["identifier"] + "!    ")
         elif key == "ppi_dataset":
-            if value in ppi_values:
+            if value in TaskParameter.PpiValues.PPI_VALUES:
                 normalized_params["parameters"]["ppi_dataset"] = value
             else:
                 warnings.warn("The PPI-dataset: " + str(value) + " is not known to Drugstone!"
                               + " The PPI-dataset is changed to "
                               + normalized_params["parameters"]["ppi_dataset"] + "!    ")
         elif key == "pdi_dataset":
-            if value in pdi_values:
+            if value in TaskParameter.PdiValues.PDI_VALUES:
                 normalized_params["parameters"]["pdi_dataset"] = value
             else:
                 warnings.warn("The PDI-dataset: " + str(value) + " is not known to Drugstone!"

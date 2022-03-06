@@ -1,10 +1,15 @@
-def normalize_nodes(results: dict) -> dict:
-    """Returns a normalized dict of the drugs and genes.
+"""
+drugstone.scripts.normalize_nodes
 
-    Parameters
-    ----------
-    results
-    """
+This module implements the normalize_nodes function.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
+
+def normalize_nodes(results: dict) -> dict:
+    """Returns a normalized dict of the drugs and genes."""
 
     drugs = {}
     genes = {}

@@ -1,3 +1,12 @@
+"""
+drugstone.task.tasks_result
+
+This module implements the class :class:`TasksResult` for the drugstone API.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
 import json
 from typing import List
 from .task import Task
@@ -6,14 +15,32 @@ from .scripts.make_upsetplot import make_upset_plot
 
 
 class TasksResult:
+    """Represents the results of a list of :class:`Task` objects.
+
+    get_tasks_list() -> List[:class:`Task`]:
+        Returns the list of tasks.
+
+    to_dict() -> dict:
+        Returns a dict with the results of the tasks.
+
+    download_json(path: str, name: str) -> None:
+        Downloads a json file with the results.
+
+    create_upset_plot() -> None:
+        Opens a new window with an upset plot of the results.
+    """
 
     def __init__(self, tasks: List[Task] = []) -> None:
         self.__tasks = tasks
 
     def get_tasks_list(self) -> List[Task]:
+        """Returns the list of tasks."""
+
         return self.__tasks
 
     def to_dict(self) -> dict:
+        """Returns a dict with the results of the tasks."""
+
         d = {}
         for t in self.__tasks:
             d[t.get_parameters()["taskId"]] = {
@@ -23,11 +50,21 @@ class TasksResult:
             }
         return d
 
-    def download_json(self, path: str = "", name: str = "result"):
-        """Downloads a json file with the results to the given folder."""
+    def download_json(self, path: str = "", name: str = "result") -> None:
+        """Downloads a json file with the results.
+
+        :param str path: (optional) Path, where to download the file. Defaults to the current path.
+        :param str name: (optional) Name for the file. Defaults to 'result'.
+        """
+
         path = create_path(path, name, "json")
         with open(path, "x") as f:
             json.dump(self.to_dict(), f, indent=4)
 
-    def create_upsetplot(self):
+    def create_upset_plot(self) -> None:
+        """Opens a new window with an upset plot of the results.
+
+        This is only available with python 3.6!
+        """
+
         make_upset_plot(self.to_dict())

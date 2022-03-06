@@ -1,3 +1,12 @@
+"""
+drugstone.scripts.request_task_result
+
+This module implements the request_task_result function.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
 import requests
 from .constants.url import Url
 from .check_result_size import check_result_size
@@ -8,15 +17,6 @@ def request_task_result(token: str, params: dict) -> dict:
     """Returns a normalized dict of the results.
 
     result = {drugs: {}, genes: {}}
-
-    Parameters
-    ----------
-    token: str
-    params: dict
-
-    Returns
-    -------
-
     """
     url_parameter = "?view=&fmt=&token=" + token
     result = requests.get(

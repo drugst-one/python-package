@@ -1,3 +1,12 @@
+"""
+drugstone.scripts.map_nodes_to_internal_ids
+
+This module implements the map_nodes_to_internal_ids function.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
 import requests
 import warnings
 from .constants.url import Url
@@ -8,17 +17,9 @@ from .normalize_task_parameter import normalize_task_parameter
 def map_nodes_to_internal_ids(
         nodes: list,
         params: dict = dict({})) -> list:
-    """
-    Maps the given nodes to the internal IDs.
-    Returns a list of the internal IDs for
-    Parameters:
-        * nodes: list of nodes
-        * identifier: defaults to 'symbol'
+    """Maps the given nodes to the internal IDs.
 
-    Parameters
-    ----------
-    nodes
-    params
+    Returns a list of the internal IDs.
     """
 
     if "identifier" in params:

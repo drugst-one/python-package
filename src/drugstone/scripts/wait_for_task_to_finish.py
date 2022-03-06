@@ -1,3 +1,12 @@
+"""
+drugstone.scripts.wait_for_task_to_finish
+
+This module implements the wait_for_task_to_finish function.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
 import logging
 import warnings
 import time
@@ -5,17 +14,7 @@ from .request_task_info import request_task_info
 
 
 def wait_for_task_to_finish(token: str, task_id: str = None) -> dict:
-    """
-    Waits for the Task to finish and returns the task information.
-    Parameters
-    ----------
-    token
-    task_id
-
-    Returns
-    -------
-    dict: task information
-    """
+    """Waits for the task to finish and returns the task information."""
 
     info = request_task_info(token)
     while not info["done"] and not info["failed"]:

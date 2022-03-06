@@ -1,8 +1,18 @@
+"""
+drugstone.scripts.task_id
+
+This module implements the class TaskId.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
 import random
 import string
 
 
 class TaskId:
+    """Creates unique ids and memorizes them in '__ids'."""
 
     __ids = []
 

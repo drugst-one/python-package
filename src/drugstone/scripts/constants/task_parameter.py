@@ -1,6 +1,16 @@
+"""
+drugstone.scripts.constants.task_parameter
+
+This module implements the class TaskParameter.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
+
 class TaskParameter:
 
-    # Available genaral parameters.
+    # Available general parameters.
     IDENTIFIER = "identifier"
     ALGORITHM = "algorithm"
     PPI = "ppi_dataset"
@@ -35,6 +45,12 @@ class TaskParameter:
 
     # Available options for the 'algorithm' parameter.
     class AlgorithmValues:
+        DRUG_TARGET_SEARCH_VALUES = [
+            "multisteiner", "keypathwayminer", "trustrank",
+            "closeness", "degree", "betweenness"
+        ]
+        DRUG_SEARCH_VALUES = ["trustrank", "closeness", "degree", "proximity"]
+        ALGORITHM_VALUES = DRUG_TARGET_SEARCH_VALUES + DRUG_SEARCH_VALUES
         MULTISTEINER = "multisteiner"
         KEYPATHWAYMINER = "keypathwayminer"
         TRUSTRANK = "trustrank"
@@ -45,17 +61,20 @@ class TaskParameter:
     
     # Available options for the 'ppi' parameter.
     class PpiValues:
+        PPI_VALUES = ["STRING", "BioGRID", "APID"]
         STRING = "STRING"
         BIOGRID = "BioGRID"
         APID = "APID"
     
     # Available options for the 'pdi' parameter.
     class PdiValues:
+        PDI_VALUES = ["drugbank", "chembl", "dgidb"]
         DRUGBANK = "drugbank"
         CHEMBL = "chembl"
         DGIDB = "dgidb"
     
     # Available options for the 'target' parameter.
     class TargetValues:
+        TARGET_VALUES = ["drug", "drug-target"]
         DRUG = "drug"
         DRUG_TARGET = "drug-target"

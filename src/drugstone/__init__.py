@@ -1,8 +1,10 @@
 """
-drugstone.api
-~~~~~~~~~~~~~
+drugstone
 
-####################This module implements the drugstone API.
+The python package for the https://drugst.one/ platform.
+This package offers tools for drug-repurposing.
+This is a programmatic approach to the functionality of the web portal.
+For more information visit: https://drugst.one/
 
 :copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
 :author: Ugur Turhan

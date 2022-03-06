@@ -1,3 +1,12 @@
+"""
+drugstone.task.tasks
+
+This module implements the class :class:`Tasks` for the drugstone API.
+
+:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+:author: Ugur Turhan
+"""
+
 from typing import List
 from .task import Task
 from .task_result import TaskResult
@@ -5,21 +14,35 @@ from .tasks_result import TasksResult
 
 
 class Tasks:
+    """Wraps a list of :class:`Task` objects.
+
+    get_result() -> :class:`TasksResult`:
+        Returns a :class:`TasksResult` for the list of tasks.
+
+    get_union() -> :class:`TaskResult`:
+        Returns a :class:`TaskResult` with the union of the tasks.
+
+    get_intersection() -> :class:`TaskResult`:
+        Returns a :class:`TaskResult` with the intersection of the tasks.
+    """
 
     def __init__(self, tasks: List[Task] = []) -> None:
         self.__tasks = tasks
 
     def get_result(self) -> TasksResult:
+        """Returns a :class:`TasksResult` for the list of tasks."""
+
         return TasksResult(self.__tasks)
 
     def get_union(self) -> TaskResult:
+        """Returns a :class:`TaskResult` with the union of the tasks."""
+
         drugs = {}
         genes = {}
         for t in self.__tasks:
             r = t.get_result()
             drugs = {**drugs, **r.get_drugs()}
-            r_genes = r.get_genes()
-            for gene, detail in r_genes.items():
+            for gene, detail in r.get_genes().items():
                 if gene not in genes:
                     genes = {**genes, gene: detail}
                 else:
@@ -34,6 +57,8 @@ class Tasks:
         return TaskResult(drugs=drugs, genes=genes)
 
     def get_intersection(self) -> TaskResult:
+        """Returns a :class:`TaskResult` with the intersection of the tasks."""
+
         drugs = {}
         genes = {}
         first = True
