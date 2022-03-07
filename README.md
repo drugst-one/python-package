@@ -195,9 +195,9 @@ drugs = [
 ]
 
 genes = [
-    Gene(symbol="ab",has_edges_to=["xy", "xyz", "uvw", "abc", "aab"]),
-    Gene(symbol="abc",has_edges_to=["xy", "uvw", "aab"]),
-    Gene(symbol="aab",has_edges_to=["xy"])
+    Gene(symbol="ab", has_edges_to=["xy", "xyz", "uvw", "abc", "aab"]),
+    Gene(symbol="abc", has_edges_to=["xy", "uvw", "aab"]),
+    Gene(symbol="aab", has_edges_to=["xy"])
 ]
 
 s_task = static_task(drugs, genes)
@@ -205,7 +205,7 @@ r = s_task.get_result()
 r.download_graph()
 ```
 
-You can also create Tasks object with a list of Task objects.
+You can also create Tasks objects with a list of Task objects.
 ````python
 from drugstone import static_tasks, new_task
 
