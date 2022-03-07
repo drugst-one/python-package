@@ -7,7 +7,9 @@ This module implements the class :class:`TasksResult` for the drugstone API.
 :author: Ugur Turhan
 """
 
+import sys
 import json
+import logging
 from typing import List
 from .task import Task
 from .scripts.create_path import create_path
@@ -67,4 +69,7 @@ class TasksResult:
         This is only available with python 3.6!
         """
 
-        make_upset_plot(self.to_dict())
+        if sys.version_info[:2] == (3, 6):
+            make_upset_plot(self.to_dict())
+        else:
+            logging.warn("create_upset_plot() is only compatible with Python 3.6!")
