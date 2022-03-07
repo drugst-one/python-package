@@ -1,5 +1,6 @@
 # Drugstone
-This is the python package for the drugst.one platform.\
+This is the python package for the drugst.one platform.
+
 This package offers tools for drug-repurposing and 
 is a programmatic approach to the functionality of the web portal.
 For more information visit: https://drugst.one/
