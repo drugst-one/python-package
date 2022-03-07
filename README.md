@@ -1,152 +1,299 @@
-# Drugst.one-Python-package
-The python package for the https://drugst.one/ platform.
-
-## Start a new task:
-    from drugstone.drugstone import Drugstone
-
-    cf = [
-            "CFTR", "TGFB1", "SCNN1B", 
-            "DCTN4", "SCNN1A", "SCNN1G",
-            "CLCA4", "TNFRSF1A", "FCGR2A", 
-            "STX1A"  "ENG"
-        ]
-
-    p = {
-        "target": "drug",
-        "algorithm": "trustrank",
-    }
-
-    d = Drugstone()
-    t = d.new_task(seeds=cf, params=p)  # -> returns a new Task
-    r = t.get_result()                  # -> returns a TaskResult
-    r.download_json('download_path')    
-    r.to_graph('download_path')
-
-## Start multiple tasks:
-There two ways of starting multiple tasks 
-
-### List of algorithms with otherwise same parameter
-Starts a task for every algorithm in the list.
-The other parameters are the same for every task
-
-    from drugstone.drugstone import Drugstone
-
-    cf = [
-            "CFTR", "TGFB1", "SCNN1B", 
-            "DCTN4", "SCNN1A", "SCNN1G",
-            "CLCA4", "TNFRSF1A", "FCGR2A", 
-            "STX1A"  "ENG"
-        ]
-
-    p = {
-        "target": "drug",
-        "algorithm": ["trustrank", "closeness", "degree"],
-    }
-
-    d = Drugstone()
-    # mind the s in new_tasks
-    t = d.new_tasks(seeds=cf, params=p) # -> returns a new Tasks
-    r = t.get_result()                  # -> returns a TasksResult
-    r.download_json('download_path')    
-    # you can get the union or intersection of Tasks
-    # this will return a Task (without s)
-    # of the union or intersection of the tasks
-    u = t.get_union()
-    i = t.get_intersection()
-
-### List of independent parameter
-Starts a task for every parameter in the list.
-The parameters are completely independent. 
-
-    from drugstone.drugstone import Drugstone
-
-    cf = [
-            "CFTR", "TGFB1", "SCNN1B", 
-            "DCTN4", "SCNN1A", "SCNN1G",
-            "CLCA4", "TNFRSF1A", "FCGR2A", 
-            "STX1A"  "ENG"
-        ]
-
-    p1 = {
-        "target": "drug",
-        "pdi_dataset": "drugbank",
-    }
-
-    p2 = {
-        "target": "drug",
-        "pdi_dataset": "chembl",
-    }
-
-    p3 = {
-        "target": "drug",
-        "pdi_dataset": "dgidb",
-    }
-
-    d = Drugstone()
-    t = d.new_tasks(seeds=cf, params=[p1, p2, p3])
-    r = t.get_result()                  
-    r.download_json('download_path')
-
-## Combine a drug-target search with a drug search:
-This will search for drug-targets for the seeds,
-and use the targets for a drug-search.
-
-    from drugstone.drugstone import Drugstone
-
-    cf = [
-            "CFTR", "TGFB1", "SCNN1B", 
-            "DCTN4", "SCNN1A", "SCNN1G",
-            "CLCA4", "TNFRSF1A", "FCGR2A", 
-            "STX1A"  "ENG"
-        ]
-
-    # if the parameters define an algorithm,
-    # it will be used for both searches 
-    # if there is a target_search or a drug_search
-    # it overwrites the algorithm for the according task
-    # in this example the 'algorithm' value would
-    # be ignored, as it is overwritten for both tasks
-    p = {
-        "target": "drug",
-        "algorithm": "trustrank",
-        "target_search": "multisteiner",
-        "drug_search": "proximity",
-    }
-
-    d = Drugstone()
-    t = d.deep_search(seeds=cf, params=p)   # -> returns a new Task
-    r = t.get_result()                  
-    r.download_json('download_path')
-
-## Import drug or gene data
-It is possible to import drug or gene data.
-- Visualize your data with TaskResult
-- combine or compare your data with drugstone results.
+# Drugstone
+This is the python package for the drugst.one platform.\
+This package offers tools for drug-repurposing and 
+is a programmatic approach to the functionality of the web portal.
+For more information visit: https://drugst.one/
 
 
-    from drugstone.task.task import Task
-    from drugstone.task.drug import Drug
-    from drugstone.task.gene import Gene
+## Installation
+Drugstone depends on a few packages to work. 
+You can use pip to install them.
+```python
+pip install urllib3 requests pandas pyvis upsetplot
+```
+Then you can install drugstone.
+```python
+pip install drugstone
+```
+Finally, it should be possible to import drugstone to your python script.
+````python
+import drugstone
+````
+You can use 
+```python
+import drugstone as ds
+```
+to access the complete drugstone API with the `ds.` notation.
 
-    d = [Drug(label="xy"),Drug(label="xyz"),Drug(label="uvw")]
-    g = [
-            Gene(symbol="ab",has_edges_to=["xy", "xyz", "uvw", "abc", "aab"]),
-            Gene(symbol="abc",has_edges_to=["xy", "uvw", "aab"]),
-            Gene(symbol="aab",has_edges_to=["xy"])
-        ]
 
-    imp_task = Task.import_data(drugs=d, genes=g)
-    r = imp_task.get_result()
-    r.download_json('download_path')
-    r.to_graph('download_path')
+## Start a new task
+With Drugstone it is easy and convenient to search for drugs or drug-targets,
+starting with a list of genes.
+```python
+from drugstone import new_task
 
-## create custom Tasks
-You can combine tasks in Tasks.
+genes = [
+    "CFTR", "TGFB1", "SCNN1B", 
+    "DCTN4", "SCNN1A", "SCNN1G",
+    "CLCA4", "TNFRSF1A", "FCGR2A"
+]
 
-    from drugstone.task.tasks import Tasks
+parameters = {
+    "target": "drug",
+    "algorithm": "trustrank"
+}
 
-    t_s = [t1, t2, t3] # list of Task objects 
-    tasks = Tasks(t_s)
-    r = tasks.get_result()
-    r.download_json('download_path')
+# new_task() returns a Task object.
+# You can find the classes further below.
+task = new_task(genes, parameters)
+# get_result() returns a TaskResult object.
+r = task.get_result()
+r.download_json()
+r.download_graph()
+```
 
+
+## Start multiple tasks
+You can start multiple tasks at once, either with 
+completely independent parameters or 
+with same parameters and different algorithms.
+
+### Multiple algorithms
+By defining an *algorithms* value in the parameters dictionary, 
+you can pass a list of algorithm values.
+For every algorithm, a task will be started, with 
+otherwise same parameter values.
+````python
+from drugstone import new_tasks
+
+genes = [
+    "CFTR", "TGFB1", "SCNN1B", 
+    "DCTN4", "SCNN1A", "SCNN1G",
+    "CLCA4", "TNFRSF1A", "FCGR2A"
+]
+
+parameters = {
+    "target": "drug",
+    "algorithms": ["trustrank", "closeness", "degree"]
+}
+
+# Mind the 's' in new_tasks.
+tasks = new_tasks(genes, parameters)    # returns a Tasks object
+r = tasks.get_result()                  # returns a TasksResult object
+r.download_json()
+````
+
+### Independent parameters
+`new_tasks()` accepts a list of parameter dictionaries.
+For every dictionary a task will be started.
+````python
+from drugstone import new_tasks
+
+genes = [
+    "CFTR", "TGFB1", "SCNN1B", 
+    "DCTN4", "SCNN1A", "SCNN1G",
+    "CLCA4", "TNFRSF1A", "FCGR2A"
+]
+
+p1 = {
+    "target": "drug",
+    "pdi_dataset": "drugbank"
+}
+
+p2 = {
+    "target": "drug",
+    "pdi_dataset": "chembl"
+}
+
+p3 = {
+    "target": "drug",
+    "pdi_dataset": "dgidb"
+}
+
+tasks = new_tasks(genes, [p1, p2, p3])  # returns a Tasks object
+r = tasks.get_result()                  # returns a TasksResult object
+r.download_json()
+````
+
+### Union and intersection of tasks
+You can get the union or intersection of tasks.
+That returns a TaskResult with the according result.
+````python
+from drugstone import new_tasks
+
+genes = [
+    "CFTR", "TGFB1", "SCNN1B", 
+    "DCTN4", "SCNN1A", "SCNN1G",
+    "CLCA4", "TNFRSF1A", "FCGR2A"
+]
+
+parameters = {
+    "target": "drug",
+    "algorithms": ["trustrank", "closeness", "degree"]
+}
+
+tasks = new_tasks(genes, parameters)    # returns a Tasks object
+
+u = tasks.get_union()                   # returns a TaskResult object
+u.download_json()
+
+i = tasks.get_intersection()
+i.download_json()
+````
+
+
+## Combine a drug-target search with a drug search
+This will perform a drug-target search for the seed genes 
+and then use the drug-target search results and the seed genes
+to perform a drug-search.
+Finally, a Task with the drug-search results will be returned. 
+````python
+from drugstone import deep_search
+
+genes = [
+    "CFTR", "TGFB1", "SCNN1B", 
+    "DCTN4", "SCNN1A", "SCNN1G",
+    "CLCA4", "TNFRSF1A", "FCGR2A"
+]
+
+parameters = {
+    "algorithm": "trustrank"
+}
+
+task = deep_search(genes, parameters)   # returns a Task object
+r = task.get_result()                   # returns a TaskResult object
+r.download_json()
+````
+When the parameters dictionary contains an algorithm,
+it will be used for both, drug-target- and drug-search.
+You can overwrite the algorithm for the according search, 
+by defining `"target_search"` or `"drug_search"` in the parameters.
+````python
+parameters = {
+    "algorithm": "trustrank",
+    "target_search": "multisteiner",
+    "drug_search": "proximity"
+}
+````
+In this example, the *algorithm* value would be ignored, 
+as it is overwritten in both cases.
+
+
+## Static tasks
+You can import your own data into drugstone.
+That can be useful for e.g.
+- visualizing the data with TaskResult or
+- combining or comparing the data with drugstone results.
+```python
+from drugstone import static_task, Drug, Gene
+
+drugs = [
+    Drug(label="xy"),
+    Drug(label="xyz"),
+    Drug(label="uvw")
+]
+
+genes = [
+    Gene(symbol="ab",has_edges_to=["xy", "xyz", "uvw", "abc", "aab"]),
+    Gene(symbol="abc",has_edges_to=["xy", "uvw", "aab"]),
+    Gene(symbol="aab",has_edges_to=["xy"])
+]
+
+s_task = static_task(drugs, genes)
+r = s_task.get_result()
+r.download_graph()
+```
+
+You can also create Tasks object with a list of Task objects.
+````python
+from drugstone import static_tasks, new_task
+
+tasks = []
+
+for _ in range(5):
+    t = new_task(["BRCA1"], {})
+    tasks.append(t)
+
+s_tasks = static_tasks(tasks)
+r = s_tasks.get_result()
+r.download_json()
+````
+
+
+## class Task
+Represents a task.
+
+`get_result() -> TaskResult` \
+Returns a TaskResult for the result of the task.
+
+`get_info() -> dict:` \
+Returns a dict with information about the task.
+
+`get_parameters() -> dict:` \
+Returns a dict with the parameters of the task.
+
+
+## class TaskResult
+Represents the results of a task.
+
+`get_genes() -> dict:` \
+Returns a dict with the genes.
+
+`get_drugs() -> dict:` \
+Returns a dict with the drugs.
+
+`to_dict() -> dict:` \
+Returns a dict with the result.
+
+`to_pandas_dataframe() -> DataFrame:` \
+Returns a pandas DataFrame of the result.
+
+`download_json(path: str, name: str) -> None:` \
+Downloads a json file with the result.
+
+`download_genes_csv(path: str, name: str) -> None:` \
+Downloads a csv file with the genes of the result.
+
+`download_drugs_csv(path: str, name: str) -> None:` \
+Downloads a csv file with the drugs of the result.
+
+`download_edges_csv(path: str, name: str) -> None:` \
+Downloads a csv file with the edges of the result.
+
+`download_graph(path: str, name: str) -> None:` \
+Downloads a html file with a graph of the nodes.
+
+
+## class Tasks
+Wraps a list of Task objects.
+
+`get_result() -> TasksResult:` \
+Returns a TasksResult for the list of tasks.
+
+`get_union() -> TaskResult:` \
+Returns a TaskResult with the union of the tasks.
+
+`get_intersection() -> TaskResult:` \
+Returns a TaskResult with the intersection of the tasks.
+
+
+## class TasksResult
+Represents the results of a list of Task objects.
+
+`get_tasks_list() -> List[Task]:` \
+Returns the list of tasks.
+
+`to_dict() -> dict:` \
+Returns a dict with the results of the tasks.
+
+`download_json(path: str, name: str) -> None:` \
+Downloads a json file with the results.
+
+`create_upset_plot() -> None:` \
+Opens a new window with an upset plot of the results.
+
+
+
+Copyright: 2022 - Institute for Computational Systems Biology 
+by Prof. Dr. Jan Baumbach \
+Author: Ugur Turhan

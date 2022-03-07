@@ -14,7 +14,7 @@ from .scripts.create_path import create_path
 
 
 class TaskResult:
-    """Represents the results of a :class:`Task`.
+    """Represents the results of a task.
 
     get_genes() -> dict:
         Returns a dict with the genes.
