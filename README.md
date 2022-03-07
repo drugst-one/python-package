@@ -5,15 +5,18 @@ This package offers tools for drug-repurposing and
 is a programmatic approach to the functionality of the web portal.
 For more information visit: https://drugst.one/
 
+[![Downloads](https://pepy.tech/badge/requests/month)](https://pepy.tech/project/drugstone)
+[![Supported Versions](https://img.shields.io/pypi/pyversions/drugstone.svg)](https://pypi.org/project/drugstone)
+
 
 ## Installation
 Drugstone depends on a few packages to work. 
 You can use pip to install them.
-```python
+```console
 pip install urllib3 requests pandas pyvis upsetplot
 ```
 Then you can install drugstone.
-```python
+```console
 pip install drugstone
 ```
 Finally, it should be possible to import drugstone to your python script.
@@ -25,6 +28,16 @@ You can use
 import drugstone as ds
 ```
 to access the complete drugstone API with the `ds.` notation.
+
+Drugstone officially supports Python 3.6+.
+
+
+## Supported features
+Drugstone offers a toolbox for drug repurposing applications.
+- Search for drugs, interacting with a list of genes
+- Search for drug-targets, for a list of genes
+- Visualize data in common formats like JSON or CSV
+- create interaction graphs for drug- and gene-interactions
 
 
 ## Start a new task
