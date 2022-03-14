@@ -7,20 +7,16 @@ This module implements the class TaskId.
 :author: Ugur Turhan
 """
 
-import random
-import string
-
 
 class TaskId:
-    """Creates unique ids and memorizes them in '__ids'."""
+    """Creates unique ids.
 
-    __ids = []
+    The ids are just integers, starting with 1 and counting up.
+    """
+
+    __u_id = 0
 
     @classmethod
-    def get(cls, pre: str, length: int) -> str:
-        chars = string.ascii_letters + string.digits
-        t_id = pre + "-" + "".join(random.choice(chars) for _ in range(length))
-        while t_id in cls.__ids:
-            t_id = pre + "-" + "".join(random.choice(chars) for _ in range(length))
-        cls.__ids.append(t_id)
-        return t_id
+    def get(cls) -> str:
+        cls.__u_id += 1
+        return str(cls.__u_id)

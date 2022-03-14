@@ -45,18 +45,11 @@ def map_nodes_to_internal_ids(
 
     # Sends the nodes to the drugstone API
     # and receives an extended list with the internal IDs.
-    extended_node_ids = requests.post(
+    return requests.post(
         Url.MAP_NODES,
         verify=False,
         json=data
-    )
-
-    internal_ids = []
-    for n in extended_node_ids.json():
-        if "netexId" in n:
-            internal_ids.append(n["netexId"])
-
-    return internal_ids
+    ).json()
 
 
 def get_default_identifier() -> str:

@@ -14,3 +14,4 @@ class Url:
     TASK = BASE + "task/"
     TASKS = BASE + "tasks/"
     TASK_RESULTS = BASE + "task_result/"
+    FETCH_EDGES = BASE + "fetch_edges/"

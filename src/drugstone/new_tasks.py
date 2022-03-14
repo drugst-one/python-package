@@ -7,46 +7,77 @@ This module implements the new_tasks function for the drugstone API.
 :author: Ugur Turhan
 """
 
+import warnings
 from typing import Union, List
-from .task.tasks import Tasks
 from .new_task import new_task
+from .task.task import Task
+from .task.tasks import Tasks
 
 
-def new_tasks(seeds: list, parameters: Union[dict, List[dict]] = dict({})) -> Tasks:
+def new_tasks(
+        seeds: list = list([]),
+        parameters: Union[dict, List[dict]] = dict({}),
+        static: bool = False,
+        tasks: List[Task] = list([])) -> Tasks:
     """Starts multiple tasks.
 
     Starts multiple tasks, according to the user given seeds and parameters.
     Returns a :class:`Tasks` object, wrapping the individual the tasks.
 
-    :param list seeds: List of seed nodes for the tasks.
+    :param list seeds: (optional) List of seed nodes for the tasks.
     :param dict parameters: (optional) Dictionary of parameters for the tasks. Defaults to an empty dict {}.
+    :param bool static: (optional)
+    :param List[Task] tasks: (optional)
     :return: :class:`Tasks` object
     """
 
+    # static list of tasks
+    if static:
+        return Tasks(tasks)
+
+    # no seeds and no static
+    if not static and not seeds:
+        warnings.warn("Something went wrong! "
+                      + "Maybe you forgot to pass seed genes, "
+                      + "or forgot to set static to True.")
+        return Tasks()
+
+    # tasks with a list of parameter dictionaries
     if isinstance(parameters, list):
-        # returns a Tasks with a task for every parameter in the list of parameters
+        algs = []
+        for p in parameters:
+            if "algorithm" in p:
+                algs.append(p["algorithm"])
+            elif "algorithms" in p:
+                algs.append(p["algorithms"])
+        has_duplicates = len(algs) != len(set(algs))
         tasks = []
         for p in parameters:
-            t = new_task(seeds, p)
+            new_p = {**p, "has_duplicate_algorithms": has_duplicates}
+            t = new_task(seeds, new_p)
             tasks.append(t)
         return Tasks(tasks)
 
+    # tasks with a list of algorithms
     if isinstance(parameters, dict):
-        # returns a Tasks with a task ...
-        algorithm = None
+        algorithms = None
         if "algorithm" in parameters:
-            algorithm = parameters["algorithm"]
+            algorithms = parameters["algorithm"]
         elif "algorithms" in parameters:
-            algorithm = parameters["algorithms"]
-        if isinstance(algorithm, list):
-            # ... for every algorithm in the list of algorithms
+            algorithms = parameters["algorithms"]
+        if isinstance(algorithms, list):
+            has_duplicates = len(algorithms) != len(set(algorithms))
             tasks = []
-            for alg in algorithm:
-                t_param = {**parameters, "algorithm": alg}
+            for alg in algorithms:
+                t_param = {
+                    **parameters,
+                    "algorithm": alg,
+                    "has_duplicate_algorithms": has_duplicates
+                }
                 t = new_task(seeds, t_param)
                 tasks.append(t)
             return Tasks(tasks)
 
-    # or else returns a Tasks with just a single task
+    # Tasks with just a single task
     task = new_task(seeds, parameters)
     return Tasks([task])

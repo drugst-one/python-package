@@ -37,7 +37,6 @@ class Gene:
                 "uniprot_ac": self.__uniprot_ac,
                 "entrez": self.__entrez,
                 "ensg": self.__ensg,
-                "is_seed": False,
                 "has_edges_to": self.__has_edges_to
             }
         }

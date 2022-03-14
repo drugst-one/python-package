@@ -19,10 +19,13 @@ def download_network_graph(nodes: dict, path: str = "", name: str = "graph") -> 
 
     # Adds the nodes to the network.
     for g_name, gene in nodes["genes"].items():
-        if gene["is_seed"]:
-            net.add_node(g_name, g_name + " (seed)", color="blue", shape="dot")
-        elif not gene["is_seed"]:
-            net.add_node(g_name, color="green", shape="triangle")
+        if "is_seed" in gene:
+            if gene["is_seed"]:
+                net.add_node(g_name, g_name + " (seed)", color="blue", shape="dot")
+            elif not gene["is_seed"]:
+                net.add_node(g_name, color="green", shape="triangle")
+        else:
+            net.add_node(g_name, g_name + " (static)", color="gray", shape="dot")
     for drug in nodes["drugs"]:
         net.add_node(drug, color="red", shape="square")
 

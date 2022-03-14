@@ -85,6 +85,12 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
     normalized_params["parameters"]["seeds"] = seeds
     normalized_params["parameters"]["input_network"] = {"nodes": [], "edges": []}
     alg = normalized_params["algorithm"]
-    normalized_params["parameters"]["task_id"] = TaskId.get(alg, 4)
-
+    if "has_duplicate_algorithms" in user_params:
+        if user_params["has_duplicate_algorithms"]:
+            task_id = alg + "-" + TaskId.get()
+            normalized_params["parameters"]["task_id"] = task_id
+        else:
+            normalized_params["parameters"]["task_id"] = alg
+    else:
+        normalized_params["parameters"]["task_id"] = alg
     return normalized_params
