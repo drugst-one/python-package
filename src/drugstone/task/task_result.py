@@ -44,9 +44,14 @@ class TaskResult:
         Downloads a html file with a graph of the nodes.
     """
 
-    def __init__(self, drugs: dict = dict({}), genes: dict = dict({})) -> None:
+    def __init__(
+            self,
+            drugs: dict = dict({}),
+            genes: dict = dict({}),
+            raw_data: dict = dict({})) -> None:
         self.__drugs = drugs
         self.__genes = genes
+        self.__raw_data = raw_data
 
     def get_genes(self) -> dict:
         """Returns a dict with the genes."""
@@ -57,6 +62,10 @@ class TaskResult:
         """Returns a dict with the drugs."""
 
         return self.__drugs
+
+    def get_raw_result(self) -> dict:
+        """Returns the raw data of the task."""
+        return self.__raw_data
 
     def to_dict(self) -> dict:
         """Returns a dict with the result."""
@@ -78,6 +87,18 @@ class TaskResult:
         path = create_path(path, name, "json")
         with open(path, "x") as f:
             json.dump(self.to_dict(), f, indent=4)
+
+    def download_raw_json(self, path: str = "", name: str = "raw_data") -> None:
+        """Downloads a json file with the unprocessed results,
+        as they are received from the backend.
+
+        :param str path: (optional) Path, where to download the file. Defaults to the current path.
+        :param str name: (optional) Name for the file. Defaults to 'raw_data'.
+        """
+
+        path = create_path(path, name, "json")
+        with open(path, "x") as f:
+            json.dump(self.get_raw_result(), f, indent=4)
 
     def download_genes_csv(self, path: str = "", name: str = "genes") -> None:
         """Downloads a csv file with the genes of the result.

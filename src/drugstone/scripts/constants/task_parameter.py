@@ -13,6 +13,7 @@ class TaskParameter:
     # Available general parameters.
     IDENTIFIER = "identifier"
     ALGORITHM = "algorithm"
+    ALGORITHMS = "algorithms"
     PPI = "ppi_dataset"
     PDI = "pdi_dataset"
     TARGET = "target"

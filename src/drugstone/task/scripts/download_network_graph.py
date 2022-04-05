@@ -21,9 +21,11 @@ def download_network_graph(nodes: dict, path: str = "", name: str = "graph") -> 
     for g_name, gene in nodes["genes"].items():
         if "is_seed" in gene:
             if gene["is_seed"]:
-                net.add_node(g_name, g_name + " (seed)", color="blue", shape="dot")
+                # net.add_node(g_name, g_name + " (seed)", color="blue", shape="dot")
+                net.add_node(g_name, " ", color="blue", shape="dot")
             elif not gene["is_seed"]:
-                net.add_node(g_name, color="green", shape="triangle")
+                # net.add_node(g_name, shape="triangle")
+                net.add_node(g_name, " ", shape="triangle")
         else:
             net.add_node(g_name, g_name + " (static)", color="gray", shape="dot")
     for drug in nodes["drugs"]:
@@ -41,17 +43,51 @@ def download_network_graph(nodes: dict, path: str = "", name: str = "graph") -> 
     net.set_options("""
     var options = {
         "physics": {
+            "enabled": true,
+            "solver": "barnesHut",
             "barnesHut": {
-            "gravitationalConstant": -2000,
-            "centralGravity": 0,
-            "springLength": 20,
-            "springConstant": 0.005,
-            "avoidOverlap": 1
+                "gravitationalConstant": -250,
+                "centralGravity": 0.001,
+                "springLength": 50,
+                "springConstant": 0.005,
+                "avoidOverlap": 0.5
             },
-            "minVelocity": 0.75
+            "stabilization": {
+                "enabled": true,
+                "iterations": 250
+            }
         }
     }
     """)
     # net.toggle_physics(False)
     downloads_path = create_path(path, name, "html")
     net.show(downloads_path)
+
+# private static analysisPhysics = {
+#     enabled: true,
+#     solver: 'barnesHut',
+#     barnesHut: {
+#       theta: 0.1,
+#       gravitationalConstant: -50000,
+#       centralGravity: 5,
+#       springLength: 100,
+#       springConstant: 0.8,
+#       damping: 0.5,
+#       avoidOverlap: 1,
+#     },
+#     stabilization: {
+#       enabled: true,
+#       iterations: 250
+#     }
+#   };
+
+# "physics": {
+#             "barnesHut": {
+#             "gravitationalConstant": -250,
+#             "centralGravity": 0,
+#             "springLength": 50,
+#             "springConstant": 0.005,
+#             "avoidOverlap": 0.5
+#             },
+#             "minVelocity": 0.75
+#         }

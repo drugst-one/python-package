@@ -30,7 +30,7 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
     }
 
     for key, value in user_params.items():
-        if key == "algorithm":
+        if key == "algorithm" or key == "algorithms":
             if value in TaskParameter.AlgorithmValues.ALGORITHM_VALUES:
                 normalized_params["algorithm"] = value
             else:

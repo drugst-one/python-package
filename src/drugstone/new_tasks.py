@@ -12,13 +12,14 @@ from typing import Union, List
 from .new_task import new_task
 from .task.task import Task
 from .task.tasks import Tasks
+from .scripts.normalize_task_parameter import normalize_task_parameter
 
 
 def new_tasks(
         seeds: list = list([]),
         parameters: Union[dict, List[dict]] = dict({}),
         static: bool = False,
-        tasks: List[Task] = list([])) -> Tasks:
+        static_tasks: List[Task] = list([])) -> Tasks:
     """Starts multiple tasks.
 
     Starts multiple tasks, according to the user given seeds and parameters.
@@ -27,13 +28,13 @@ def new_tasks(
     :param list seeds: (optional) List of seed nodes for the tasks.
     :param dict parameters: (optional) Dictionary of parameters for the tasks. Defaults to an empty dict {}.
     :param bool static: (optional)
-    :param List[Task] tasks: (optional)
+    :param List[Task] static_tasks: (optional)
     :return: :class:`Tasks` object
     """
 
     # static list of tasks
     if static:
-        return Tasks(tasks)
+        return Tasks(static_tasks)
 
     # no seeds and no static
     if not static and not seeds:
@@ -50,6 +51,8 @@ def new_tasks(
                 algs.append(p["algorithm"])
             elif "algorithms" in p:
                 algs.append(p["algorithms"])
+            else:
+                algs.append(normalize_task_parameter({}, [])["algorithm"])
         has_duplicates = len(algs) != len(set(algs))
         tasks = []
         for p in parameters:
@@ -74,6 +77,7 @@ def new_tasks(
                     "algorithm": alg,
                     "has_duplicate_algorithms": has_duplicates
                 }
+                t_param.pop("algorithms", None)
                 t = new_task(seeds, t_param)
                 tasks.append(t)
             return Tasks(tasks)

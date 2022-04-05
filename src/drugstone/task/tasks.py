@@ -51,9 +51,11 @@ class Tasks:
                     new_edges = list(set(edges_a + edges_b))
                     genes[gene]["has_edges_to"] = new_edges
         for d in drugs:
-            drugs[d].pop("score")
+            if "score" in d:
+                drugs[d].pop("score")
         for g in genes:
-            genes[g].pop("score")
+            if "score" in g:
+                genes[g].pop("score")
         return TaskResult(drugs=drugs, genes=genes)
 
     def get_intersection(self) -> TaskResult:
@@ -80,7 +82,9 @@ class Tasks:
                         genes_intersection[gene]["has_edges_to"] = new_edges
                 genes = genes_intersection.copy()
         for d in drugs:
-            drugs[d].pop("score")
+            if "score" in d:
+                drugs[d].pop("score")
         for g in genes:
-            genes[g].pop("score")
+            if "score" in g:
+                genes[g].pop("score")
         return TaskResult(drugs=drugs, genes=genes)

@@ -20,6 +20,8 @@ from .scripts.request_task_result import request_task_result
 from .scripts.fetch_edges import fetch_edges
 from .scripts.add_edges_to_genes import add_edges_to_genes
 from .scripts.merge_results import merge_results
+from .scripts.normalize_nodes import normalize_nodes
+from .scripts.check_result_size import check_result_size
 
 
 def new_task(
@@ -70,8 +72,10 @@ def new_task(
     task_info = wait_for_task_to_finish(token, task_id)
     task_params = __create_parameters(task_info)
     if task_info["done"]:
-        task_result = request_task_result(token, task_params)
-        return Task(result=task_result, info=task_info, params=task_params)
+        raw_data = request_task_result(token)
+        normalized = normalize_nodes(raw_data)
+        task_result = check_result_size(normalized, task_params)
+        return Task(result=task_result, raw_data=raw_data, info=task_info, params=task_params)
     return Task(info=task_info, params=task_params)
 
 

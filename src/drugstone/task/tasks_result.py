@@ -64,12 +64,25 @@ class TasksResult:
             json.dump(self.to_dict(), f, indent=4)
 
     def create_upset_plot(self) -> None:
-        """Opens a new window with an upset plot of the results.
+        """Opens a new window with an upset plot of the drug results.
 
+        At least one of the tasks has to be a drug-search.
         This is only available with python 3.6!
         """
 
-        if sys.version_info[:2] == (3, 6):
-            make_upset_plot(self.to_dict())
+        has_drugs = False
+        for task in self.get_tasks_list():
+            if task.get_result().get_drugs():
+                has_drugs = True
+
+        if has_drugs:
+            if sys.version_info[:2] == (3, 6):
+                logging.info("IMPORTANT: The script pauses for the new window, for the UpSet plot! "
+                             + "Close the UpSet plot window, for the script to continue or terminate! ")
+                make_upset_plot(self.to_dict())
+            else:
+                logging.warn("create_upset_plot() is only compatible with Python 3.6!")
         else:
-            logging.warn("create_upset_plot() is only compatible with Python 3.6!")
+            logging.warn("Something went wrong! "
+                         + "At least one task has to be a drug-search. "
+                         + "No drugs were found.")

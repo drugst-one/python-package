@@ -7,11 +7,12 @@ This module implements the deep_search function for the drugstone API.
 :author: Ugur Turhan
 """
 
+from typing import Union, List
 from .task.task import Task
 from .new_task import new_task
 
 
-def deep_search(seeds: list, parameters: dict = dict({})) -> Task:
+def deep_search(seeds: list, parameters: Union[dict, List[dict]] = dict({})) -> Task:
     """Performs a drug-target search of the seeds, followed by a drug search on the drug-target results.
 
     Starts with a drug-target search for the seed genes.
@@ -22,16 +23,39 @@ def deep_search(seeds: list, parameters: dict = dict({})) -> Task:
     :return: :class:`Task` object
     """
 
+    # task parameters
+    t_params = {"algorithm": "keypathwayminer", "k": 10}
+    d_params = {}
+
+    if isinstance(parameters, list):
+        if len(parameters) == 2:
+            t_params = {**t_params, **parameters[0]}
+            d_params = {**d_params, **parameters[1]}
+        elif len(parameters) == 1:
+            t_params = {**t_params, **parameters[0]}
+            d_params = {**d_params, **parameters[0]}
+
+    if isinstance(parameters, dict):
+        for key, value in parameters.items():
+            if isinstance(value, list) and len(value) > 1:
+                t_params[key] = value[0]
+                d_params[key] = value[1]
+            else:
+                t_params[key] = value
+                d_params[key] = value
+
+    t_params["target"] = "drug-target"
+    d_params["target"] = "drug"
+    if t_params.get("algorithm", None) == d_params.get("algorithm", None):
+        t_params["has_duplicate_algorithms"] = True
+        d_params["has_duplicate_algorithms"] = True
+
     # target search
-    t_params = {**parameters, "target": "drug-target"}
-    if "target_search" in parameters:
-        t_params["algorithm"] = parameters["target_search"]
     t_search = new_task(seeds, t_params)
-    targets = t_search.get_result().get_genes()
+    t_result = t_search.get_result().get_genes()
+    # # keypathwayminer sometimes does not return all seeds
+    targets = list({*seeds, *list(t_result.keys())})
 
     # drug search
-    d_params = {**parameters, "target": "drug"}
-    if "drug_search" in parameters:
-        d_params["algorithm"] = parameters["drug_search"]
-    d_search = new_task(list(targets.keys()), d_params)
+    d_search = new_task(targets, d_params)
     return d_search

@@ -25,10 +25,12 @@ class Task:
 
     def __init__(self,
                  result: dict = None,
+                 raw_data: dict = dict({}),
                  info: dict = dict({}),
                  params: dict = dict({})) -> None:
         self.__info = info
         self.__params = params
+        self.__raw_data = raw_data
         if result is None:
             self.__result = dict({"drugs": {}, "genes": {}})
         else:
@@ -38,7 +40,8 @@ class Task:
         """Returns a :class:`TaskResult` for the result of the task."""
 
         return TaskResult(drugs=self.__result["drugs"],
-                          genes=self.__result["genes"])
+                          genes=self.__result["genes"],
+                          raw_data=self.__raw_data)
 
     def get_info(self) -> dict:
         """Returns a dict with information about the task."""
