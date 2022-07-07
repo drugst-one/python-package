@@ -53,14 +53,14 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
                               + " The identifier is changed to "
                               + normalized_params["parameters"]["config"]["identifier"] + "!    ")
         elif key == "ppi_dataset":
-            if value in TaskParameter.PpiValues.PPI_VALUES:
+            if value.lower() in TaskParameter.PpiValues.PPI_VALUES:
                 normalized_params["parameters"]["ppi_dataset"] = value
             else:
                 warnings.warn("The PPI-dataset: " + str(value) + " is not known to Drugstone!"
                               + " The PPI-dataset is changed to "
                               + normalized_params["parameters"]["ppi_dataset"] + "!    ")
         elif key == "pdi_dataset":
-            if value in TaskParameter.PdiValues.PDI_VALUES:
+            if value.lower() in TaskParameter.PdiValues.PDI_VALUES:
                 normalized_params["parameters"]["pdi_dataset"] = value
             else:
                 warnings.warn("The PDI-dataset: " + str(value) + " is not known to Drugstone!"

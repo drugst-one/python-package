@@ -62,14 +62,14 @@ class TaskParameter:
     
     # Available options for the 'ppi' parameter.
     class PpiValues:
-        PPI_VALUES = ["STRING", "BioGRID", "APID", "NeDRex"]
-        STRING = "STRING"
-        BIOGRID = "BioGRID"
-        APID = "APID"
+        PPI_VALUES = ["intact", "string", "biogrid", "apid", "iid", "nedrex"]
+        STRING = "string"
+        BIOGRID = "biogrid"
+        APID = "apid"
     
     # Available options for the 'pdi' parameter.
     class PdiValues:
-        PDI_VALUES = ["drugbank", "chembl", "dgidb", "NeDRex"]
+        PDI_VALUES = ["drugbank", "chembl", "dgidb", "nedrex", "drug central"]
         DRUGBANK = "drugbank"
         CHEMBL = "chembl"
         DGIDB = "dgidb"

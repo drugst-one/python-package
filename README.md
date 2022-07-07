@@ -37,6 +37,17 @@ Drugstone offers a toolbox for drug repurposing applications.
 - create interaction graphs for drug and gene interactions
 
 
+## Available Datasets
+
+Protein-protein interactions (ppi_dataset):
+
+``` NeDRex, BioGRID, IID, IntAct, STRING, APID```
+
+Protein-drug interactions (pdi_dataset): 
+
+```NeDRex, DrugBank, Drug Central, ChEMBL, DGIdb```
+
+
 ## Start a new task
 With Drugstone it is easy and convenient to search for drugs or drug-targets,
 starting with a list of genes.
@@ -105,16 +116,19 @@ genes = [
 
 p1 = {
     "target": "drug",
+    "ppi_dataset": 'nedrex',
     "pdi_dataset": "drugbank"
 }
 
 p2 = {
     "target": "drug",
+    "ppi_dataset": 'IID',
     "pdi_dataset": "chembl"
 }
 
 p3 = {
     "target": "drug",
+    "ppi_dataset": 'apid',
     "pdi_dataset": "dgidb"
 }
 
