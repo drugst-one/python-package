@@ -9,7 +9,8 @@ This module implements the class Url.
 
 
 class Url:
-    BASE = "https://drugst.one/drugstone_api/"
+    BASE = "https://api.drugst.one/"
+    # BASE = "localhost:8001/"
     MAP_NODES = BASE + "map_nodes/"
     TASK = BASE + "task/"
     TASKS = BASE + "tasks/"
