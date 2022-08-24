@@ -47,6 +47,16 @@ Protein-drug interactions (pdi_dataset):
 
 ```NeDRex, DrugBank, Drug Central, ChEMBL, DGIdb```
 
+Please note that some of the datasets require you to accept their terms and conditions before usage. ```DrugBank``` can only be used if the license has been agreed to and since ```NeDRex``` includes ```DrugBank``` data, only a part of ```NeDRex``` is available without agreeing to our license.
+
+The terms and conditions can be read by calling 
+
+```drugstone.print_license()```
+
+and can be accepted after reading with 
+
+```drugstone.accept_license()```. 
+
 
 ## Start a new task
 With Drugstone it is easy and convenient to search for drugs or drug-targets,
@@ -68,6 +78,11 @@ parameters = {
 task = new_task(genes, parameters)
 
 r = task.get_result()
+
+genes = r.get_genes()
+drugs = r.get_drugs()
+
+# save directly to files
 r.download_json()
 r.download_graph()
 ```

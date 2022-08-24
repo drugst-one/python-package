@@ -26,13 +26,13 @@ def normalize_nodes(results: dict) -> dict:
             n_name = node["label"]
             drugs[n_name] = node
         elif node["node_type"] == "protein":
-            n_name = node["symbol"]
+            n_name = node["symbol"][0]
             genes[n_name] = node
 
     # Adds to the genes if it's a seed or not.
     is_seed = results["nodeAttributes"]["isSeed"]
     for _, g_details in genes.items():
-        g_details["is_seed"] = is_seed[g_details["netexId"]]
+        g_details["is_seed"] = is_seed[g_details["symbol"][0]]
 
     # Normalizes the scores for the drugs.
     drug_scores = []
@@ -76,7 +76,7 @@ def normalize_nodes(results: dict) -> dict:
     # Adds the edges to the genes.
     edges = results["network"]["edges"]
     for _, gene in genes.items():
-        edges_dict = [x for x in edges if x["from"] == gene["netexId"]]
+        edges_dict = [x for x in edges if x["from"] == gene["drugstoneId"]]
         edges_netex_id = []
         edges_normalized = []
         for e in edges_dict:
@@ -84,11 +84,11 @@ def normalize_nodes(results: dict) -> dict:
         for e in edges_netex_id:
             if str(e).startswith("p"):
                 for _, g in genes.items():
-                    if e == g["netexId"]:
+                    if e == g["drugstoneId"]:
                         edges_normalized.append(g["symbol"])
             elif str(e).startswith("d"):
                 for _, d in drugs.items():
-                    if e == d["netexId"]:
+                    if e == d["drugstoneId"]:
                         edges_normalized.append(d["label"])
             else:
                 edges_normalized.append(e)
@@ -96,13 +96,13 @@ def normalize_nodes(results: dict) -> dict:
 
     # Removes unnecessary properties from drugs.
     for _, drug in drugs.items():
-        drug.pop("netexId")
+        drug.pop("drugstoneId")
         drug.pop("trialLinks")
         drug.pop("node_type")
 
     # Removes unnecessary properties from genes.
     for _, gene in genes.items():
-        gene.pop("netexId")
+        gene.pop("drugstoneId")
         gene.pop("node_type")
 
     return {"drugs": drugs, "genes": genes}

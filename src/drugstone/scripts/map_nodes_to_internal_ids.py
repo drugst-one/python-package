@@ -45,11 +45,12 @@ def map_nodes_to_internal_ids(
 
     # Sends the nodes to the drugstone API
     # and receives an extended list with the internal IDs.
-    return requests.post(
+    mapped_nodes = requests.post(
         Url.MAP_NODES,
         verify=False,
         json=data
     ).json()
+    return mapped_nodes
 
 
 def get_default_identifier() -> str:

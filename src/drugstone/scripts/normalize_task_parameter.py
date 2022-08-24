@@ -12,18 +12,18 @@ import warnings
 from typing import Dict
 from .task_id import TaskId
 from .constants.task_parameter import TaskParameter
-
+from ..license import license
 
 def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
     """Normalizes the parameter dictionary from the user."""
-
     normalized_params: Dict[str, any] = {
         "algorithm": "trustrank",
         "target": "drug",
         "parameters": {
             "target": "drug",
             "ppi_dataset": "STRING",
-            "pdi_dataset": "drugbank",
+            "pdi_dataset": "DGidb",
+            "licenced": license.accepted,
             "result_size": 20,
             "config": {"identifier": "symbol"},
         }

@@ -22,6 +22,7 @@ from .scripts.add_edges_to_genes import add_edges_to_genes
 from .scripts.merge_results import merge_results
 from .scripts.normalize_nodes import normalize_nodes
 from .scripts.check_result_size import check_result_size
+from .license import license
 
 
 def new_task(
@@ -46,9 +47,15 @@ def new_task(
     """
 
     extended_genes = map_nodes_to_internal_ids(seeds, parameters)
-    internal_ids = [n["netexId"] for n in extended_genes if "netexId" in n]
-    normalized_params = normalize_task_parameter(parameters, internal_ids)
+    # remove leading 'p'
+    try:
+        primary_id_space = parameters['identifier']
+    except:
+        primary_id_space = 'symbol'
 
+
+    internal_ids = [n[primary_id_space][0] for n in extended_genes]
+    normalized_params = normalize_task_parameter(parameters, internal_ids)
     # static task
     if static:
         dataset = normalized_params["parameters"]["ppi_dataset"]
@@ -83,7 +90,7 @@ def __create_parameters(info: dict) -> dict:
     algor = info["algorithm"]
     param = info["parameters"]
     param["algorithm"] = algor
-    param.pop("inputNetwork")
+    del param["inputNetwork"]
     return param
 
 
