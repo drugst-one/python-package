@@ -47,14 +47,11 @@ def new_task(
     """
 
     extended_genes = map_nodes_to_internal_ids(seeds, parameters)
-    # remove leading 'p'
-    try:
-        primary_id_space = parameters['identifier']
-    except:
-        primary_id_space = 'symbol'
 
+    if 'identifier' not in parameters:
+        parameters['identifier'] = 'symbol'
 
-    internal_ids = [n[primary_id_space][0] for n in extended_genes]
+    internal_ids = [n[parameters['identifier']][0] for n in extended_genes if n['drugstoneType'] == 'protein']
     normalized_params = normalize_task_parameter(parameters, internal_ids)
     # static task
     if static:
@@ -80,7 +77,7 @@ def new_task(
     task_params = __create_parameters(task_info)
     if task_info["done"]:
         raw_data = request_task_result(token)
-        normalized = normalize_nodes(raw_data)
+        normalized = normalize_nodes(raw_data, parameters['identifier'])
         task_result = check_result_size(normalized, task_params)
         return Task(result=task_result, raw_data=raw_data, info=task_info, params=task_params)
     return Task(info=task_info, params=task_params)

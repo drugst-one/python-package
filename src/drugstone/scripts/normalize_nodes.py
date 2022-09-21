@@ -8,7 +8,8 @@ This module implements the normalize_nodes function.
 """
 
 
-def normalize_nodes(results: dict) -> dict:
+
+def normalize_nodes(results: dict, identifier: str) -> dict:
     """Returns a normalized dict of the drugs and genes."""
 
     drugs = {}
@@ -32,7 +33,7 @@ def normalize_nodes(results: dict) -> dict:
     # Adds to the genes if it's a seed or not.
     is_seed = results["nodeAttributes"]["isSeed"]
     for _, g_details in genes.items():
-        g_details["is_seed"] = is_seed[g_details["symbol"][0]]
+        g_details["is_seed"] = False if g_details["symbol"][0] not in is_seed else is_seed[g_details["symbol"][0]]
 
     # Normalizes the scores for the drugs.
     drug_scores = []

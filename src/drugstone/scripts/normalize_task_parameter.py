@@ -16,6 +16,7 @@ from ..license import license
 
 def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
     """Normalizes the parameter dictionary from the user."""
+    # default parameters
     normalized_params: Dict[str, any] = {
         "algorithm": "trustrank",
         "target": "drug",

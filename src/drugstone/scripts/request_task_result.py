@@ -9,8 +9,6 @@ This module implements the request_task_result function.
 
 import requests
 from .constants.url import Url
-from .check_result_size import check_result_size
-from .normalize_nodes import normalize_nodes
 
 
 def request_task_result(token: str) -> dict:

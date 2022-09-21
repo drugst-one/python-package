@@ -202,7 +202,33 @@ r = task.get_result()
 r.download_json()
 ````
 
+## Available Parameters
 
+````
+parameters = {
+    "algorithm": "trustrank" | "multisteiner" | "keypathwayminer" | "closeness" | "degree" | "proximity" | "betweenness",
+    "ppi_dataset": "NeDRex",
+    "pdi_dataset: "NeDRex",
+    "result_size": 20,
+    "target": "drug" | "drug-target",
+    "include_indirect_drugs": True | False,
+    "include_non_approved_drugs": True | False,
+    "max_deg": sys.maxsize, # filter out nodes with high degrees
+    "hub_penalty": 0.0, # penalize hub nodes
+    "filter_paths": True | False, # include only shortest connections in the result
+
+    "damping_factor": 0.85, # only in trustrank
+
+    "num_trees": 5, # only in multisteiner
+    "tolerance": 10, # only in multisteiner
+
+    "k": 5, # only in keypathwayminer
+} 
+````
+
+For more information about the algorithms, please refer to <a href="https://drugst.one/doc#implementation_algorithms">https://drugst.one/doc#implementation_algorithms</a>.
+
+For more information abouyt the available dataset types, please refer to <a href="https://drugst.one/doc#implementation_datasources">https://drugst.one/doc#implementation_datasources</a>.
 
 ## class Task
 Represents a task.
