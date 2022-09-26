@@ -46,10 +46,10 @@ class Tasks:
                 if gene not in genes:
                     genes = {**genes, gene: detail}
                 else:
-                    edges_a = genes[gene]["has_edges_to"]
-                    edges_b = detail["has_edges_to"]
+                    edges_a = genes[gene]["hasEdgesTo"]
+                    edges_b = detail["hasEdgesTo"]
                     new_edges = list(set(edges_a + edges_b))
-                    genes[gene]["has_edges_to"] = new_edges
+                    genes[gene]["hasEdgesTo"] = new_edges
         for d in drugs:
             if "score" in d:
                 drugs[d].pop("score")
@@ -76,10 +76,10 @@ class Tasks:
                 for gene, detail in r.get_genes().items():
                     if gene in genes:
                         genes_intersection = {**genes_intersection, gene: detail}
-                        edges_a = genes[gene]["has_edges_to"]
-                        edges_b = detail["has_edges_to"]
+                        edges_a = genes[gene]["hasEdgesTo"]
+                        edges_b = detail["hasEdgesTo"]
                         new_edges = list(set(edges_a) & set(edges_b))
-                        genes_intersection[gene]["has_edges_to"] = new_edges
+                        genes_intersection[gene]["hasEdgesTo"] = new_edges
                 genes = genes_intersection.copy()
         for d in drugs:
             if "score" in d:

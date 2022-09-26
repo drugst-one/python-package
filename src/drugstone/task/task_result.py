@@ -131,7 +131,7 @@ class TaskResult:
 
         edges = []
         for g in self.get_genes():
-            for e in self.get_genes()[g]["has_edges_to"]:
+            for e in self.get_genes()[g]["hasEdgesTo"]:
                 edges.append([g, e])
         data = {}
         for g in self.get_genes():

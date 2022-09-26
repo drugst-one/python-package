@@ -26,7 +26,7 @@ def wait_for_task_to_finish(token: str, task_id: str = None) -> dict:
     if info["done"]:
         logging.info(task_id + " is done.")
     elif info["failed"]:
-        warnings.warn(task_id + " has failed!")
+        warnings.warn(task_id + " has failed! If you are using licensed data, need to accept the license.")
     return info
 
 

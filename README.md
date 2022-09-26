@@ -113,7 +113,7 @@ parameters = {
 }
 
 tasks = new_tasks(genes, parameters)   
-r = tasks.get_result()                 
+r = task.to_dict()                
 r.download_json()
 ````
 
@@ -131,25 +131,28 @@ genes = [
 
 p1 = {
     "target": "drug",
-    "ppi_dataset": 'nedrex',
-    "pdi_dataset": "drugbank"
+    "ppiDataset": 'nedrex',
+    "pdiDataset": "drugcentral"
 }
 
 p2 = {
     "target": "drug",
-    "ppi_dataset": 'IID',
-    "pdi_dataset": "chembl"
+    "ppiDataset": 'IID',
+    "pdiDataset": "chembl"
 }
 
 p3 = {
     "target": "drug",
-    "ppi_dataset": 'apid',
-    "pdi_dataset": "dgidb"
+    "ppiDataset": 'apid',
+    "pdiDataset": "dgidb"
 }
 
 tasks = new_tasks(genes, [p1, p2, p3]) 
-r = tasks.get_result()                 
-r.download_json()
+r = tasks.get_result() 
+r.to_dict()                 
+r.download_json()  
+# only with Python 3.6                 
+r.create_upset_plot()                 
 ````
 
 ### Union and intersection of tasks
@@ -198,24 +201,28 @@ parameters = {
 }
 
 task = deep_search(genes, parameters)  
-r = task.get_result()                  
+r = tasks.get_result() 
+r.to_dict()                 
 r.download_json()
+# only with Python 3.6                 
+r.create_upset_plot()  
 ````
 
 ## Available Parameters
 
 ````
 parameters = {
+    "identifier": "symbol", #("entrez" | "uniprot" | "ensg" will be supported in future versions)
     "algorithm": "trustrank" | "multisteiner" | "keypathwayminer" | "closeness" | "degree" | "proximity" | "betweenness",
-    "ppi_dataset": "NeDRex",
-    "pdi_dataset: "NeDRex",
-    "result_size": 20,
+    "ppiDataset": "NeDRex",
+    "pdiDataset": "NeDRex",
+    "resultSize": 20,
     "target": "drug" | "drug-target",
-    "include_indirect_drugs": True | False,
-    "include_non_approved_drugs": True | False,
-    "max_deg": sys.maxsize, # filter out nodes with high degrees
-    "hub_penalty": 0.0, # penalize hub nodes
-    "filter_paths": True | False, # include only shortest connections in the result
+    "includeIndirectDrugs": True | False,
+    "includeNonApprovedDrugs": True | False,
+    "maxDeg": sys.maxsize, # filter out nodes with high degrees
+    "hubPenalty": 0.0, # penalize hub nodes
+    "filterPaths": True | False, # include only shortest connections in the result
 
     "damping_factor": 0.85, # only in trustrank
 

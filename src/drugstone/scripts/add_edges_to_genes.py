@@ -1,8 +1,13 @@
 
 
+import string
+
+
 def add_edges_to_genes(
         genes: list,
-        edges: list, ) -> dict:
+        edges: list, 
+        identifier: string
+        ) -> dict:
 
     for gene in genes:
         if "drugstoneId" in gene:
@@ -10,11 +15,11 @@ def add_edges_to_genes(
             symbol_edges = []
             for e in netex_edges:
                 for g in genes:
-                    if "symbol" in g and "drugstoneId" in g and e == g["drugstoneId"]:
-                        symbol_edges.append(g["symbol"])
-            gene["has_edges_to"] = symbol_edges
+                    if identifier in g and "drugstoneId" in g and e == g["drugstoneId"]:
+                        symbol_edges.append(g[identifier])
+            gene["hasEdgesTo"] = symbol_edges
         else:
-            gene["has_edges_to"] = []
+            gene["hasEdgesTo"] = []
 
     result = {"drugs": {}, "genes": {}}
 

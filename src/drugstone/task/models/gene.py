@@ -15,7 +15,7 @@ class Gene:
     def __init__(self,
                  symbol: str = None,
                  protein_name: str = None,
-                 has_edges_to: List[str] = None,
+                 hasEdgesTo: List[str] = None,
                  uniprot_ac: str = None,
                  entrez: str = None,
                  ensg: List[str] = None):
@@ -24,10 +24,7 @@ class Gene:
         self.__uniprot_ac = uniprot_ac
         self.__entrez = entrez
         self.__ensg = ensg
-        if has_edges_to is None:
-            self.__has_edges_to = []
-        else:
-            self.__has_edges_to = has_edges_to
+        self.__hasEdgesTo = hasEdgesTo or []
 
     def to_dict(self):
         return {
@@ -37,6 +34,6 @@ class Gene:
                 "uniprot_ac": self.__uniprot_ac,
                 "entrez": self.__entrez,
                 "ensg": self.__ensg,
-                "has_edges_to": self.__has_edges_to
+                "hasEdgesTo": self.__hasEdgesTo
             }
         }

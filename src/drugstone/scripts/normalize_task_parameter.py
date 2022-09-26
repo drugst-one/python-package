@@ -22,10 +22,10 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
         "target": "drug",
         "parameters": {
             "target": "drug",
-            "ppi_dataset": "STRING",
-            "pdi_dataset": "DGidb",
+            "ppiDataset": "STRING",
+            "pdiDataset": "DGidb",
             "licenced": license.accepted,
-            "result_size": 20,
+            "resultSize": 20,
             "config": {"identifier": "symbol"},
         }
     }
@@ -53,27 +53,27 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
                 warnings.warn("The identifier: " + str(value) + " is not known to Drugstone!"
                               + " The identifier is changed to "
                               + normalized_params["parameters"]["config"]["identifier"] + "!    ")
-        elif key == "ppi_dataset":
+        elif key == "ppiDataset":
             if value.lower() in TaskParameter.PpiValues.PPI_VALUES:
-                normalized_params["parameters"]["ppi_dataset"] = value
+                normalized_params["parameters"]["ppiDataset"] = value
             else:
                 warnings.warn("The PPI-dataset: " + str(value) + " is not known to Drugstone!"
                               + " The PPI-dataset is changed to "
-                              + normalized_params["parameters"]["ppi_dataset"] + "!    ")
-        elif key == "pdi_dataset":
+                              + normalized_params["parameters"]["ppiDataset"] + "!    ")
+        elif key == "pdiDataset":
             if value.lower() in TaskParameter.PdiValues.PDI_VALUES:
-                normalized_params["parameters"]["pdi_dataset"] = value
+                normalized_params["parameters"]["pdiDataset"] = value
             else:
                 warnings.warn("The PDI-dataset: " + str(value) + " is not known to Drugstone!"
                               + " The PDI-dataset is changed to "
-                              + normalized_params["parameters"]["pdi_dataset"] + "!    ")
-        elif key == "result_size":
+                              + normalized_params["parameters"]["pdiDataset"] + "!    ")
+        elif key == "resultSize":
             if isinstance(value, int):
-                normalized_params["parameters"]["result_size"] = value
+                normalized_params["parameters"]["resultSize"] = value
             else:
                 warnings.warn("Invalid result_size: " + str(value) + ", has to be an integer!"
                               + " The result_size is changed to "
-                              + str(normalized_params["parameters"]["result_size"]) + "!    ")
+                              + str(normalized_params["parameters"]["resultSize"]) + "!    ")
         else:
             normalized_params["parameters"][key] = value
 

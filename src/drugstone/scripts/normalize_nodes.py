@@ -14,6 +14,7 @@ def normalize_nodes(results: dict, identifier: str) -> dict:
 
     drugs = {}
     genes = {}
+    drugstone_drug_id_to_label = {}
 
     # For all the nodes in the results,
     # differentiates if it's a drug or gene
@@ -23,17 +24,37 @@ def normalize_nodes(results: dict, identifier: str) -> dict:
     for n_id, n_type in node_types.items():
         nodes[n_id]["node_type"] = n_type
     for _, node in nodes.items():
+        # init edge list for later
+        node['hasEdgesTo'] = []
+        node['isResult'] = False
+        node['isConnector'] = False
         if node["node_type"] == "drug":
             n_name = node["label"]
             drugs[n_name] = node
+            # needed because edge targets are drugstone IDs for drugs and not labels
+            drugstone_drug_id_to_label[node['drugstoneId']] = n_name
         elif node["node_type"] == "protein":
-            n_name = node["symbol"][0]
+            n_name = node[identifier][0]
             genes[n_name] = node
 
     # Adds to the genes if it's a seed or not.
     is_seed = results["nodeAttributes"]["isSeed"]
     for _, g_details in genes.items():
-        g_details["is_seed"] = False if g_details["symbol"][0] not in is_seed else is_seed[g_details["symbol"][0]]
+        g_details["is_seed"] = False if g_details[identifier][0] not in is_seed else is_seed[g_details["symbol"][0]]
+
+    # Add information if node is result node
+    for node in results['targetNodes']:
+        try:
+            # node is drug
+            label = drugstone_drug_id_to_label[node]
+            drugs[label]['isResult'] = True
+        except KeyError:
+            # node is gene
+            genes[node]['isResult'] = True
+
+    # add information if node is connector node
+    for node in results['intermediateNodes']:
+        genes[node]['isConnector'] = True
 
     # Normalizes the scores for the drugs.
     drug_scores = []
@@ -76,24 +97,23 @@ def normalize_nodes(results: dict, identifier: str) -> dict:
 
     # Adds the edges to the genes.
     edges = results["network"]["edges"]
-    for _, gene in genes.items():
-        edges_dict = [x for x in edges if x["from"] == gene["drugstoneId"]]
-        edges_netex_id = []
-        edges_normalized = []
-        for e in edges_dict:
-            edges_netex_id.append(e["to"])
-        for e in edges_netex_id:
-            if str(e).startswith("p"):
-                for _, g in genes.items():
-                    if e == g["drugstoneId"]:
-                        edges_normalized.append(g["symbol"])
-            elif str(e).startswith("d"):
-                for _, d in drugs.items():
-                    if e == d["drugstoneId"]:
-                        edges_normalized.append(d["label"])
+
+    for e in edges:
+        # test if it is a drug or gene edge
+        if any([x in drugstone_drug_id_to_label for x in [e['from'], e['to']]]):
+            # drug edge
+            if e['from'] in drugstone_drug_id_to_label:
+                label = drugstone_drug_id_to_label[e['from']]
+                drugs[label]['hasEdgesTo'].append(e['to'])
             else:
-                edges_normalized.append(e)
-        gene["has_edges_to"] = edges_normalized
+                label = drugstone_drug_id_to_label[e['to']]
+                drugs[label]['hasEdgesTo'].append(e['from'])
+        else:
+            # gene edge
+            if any([x not in genes for x in [e['from'], e['to']]]):
+                #  some edge targets are somehow not in the network, this should be fixed in the backend
+                continue
+            genes[e['from']]['hasEdgesTo'].append(e['to'])
 
     # Removes unnecessary properties from drugs.
     for _, drug in drugs.items():

@@ -14,15 +14,15 @@ class TaskParameter:
     IDENTIFIER = "identifier"
     ALGORITHM = "algorithm"
     ALGORITHMS = "algorithms"
-    PPI = "ppi_dataset"
-    PDI = "pdi_dataset"
+    PPI = "ppiDataset"
+    PDI = "pdiDataset"
     TARGET = "target"
-    MAX_DEG = "max_deg"
-    INCLUDE_INDIRECT_DRUGS = "include_indirect_drugs"
-    HUB_PENALTY = "hub_penalty"
-    RESULT_SIZE = "result_size"
-    INCLUDE_NON_APPROVED_DRUGS = "include_non_approved_drugs"
-    FILTER_PATHS = "filter_paths"
+    MAX_DEG = "maxDeg"
+    INCLUDE_INDIRECT_DRUGS = "includeIndirectDrugs"
+    HUB_PENALTY = "hubPenalty"
+    RESULT_SIZE = "resultSize"
+    INCLUDE_NON_APPROVED_DRUGS = "includeNonApprovedDrugs"
+    FILTER_PATHS = "filterPaths"
 
     # Available parameter for the trustrank algorithm.
     class Trustrank:
@@ -69,7 +69,7 @@ class TaskParameter:
     
     # Available options for the 'pdi' parameter.
     class PdiValues:
-        PDI_VALUES = ["drugbank", "chembl", "dgidb", "nedrex", "drug central"]
+        PDI_VALUES = ["drugbank", "chembl", "dgidb", "nedrex", "drugcentral"]
         DRUGBANK = "drugbank"
         CHEMBL = "chembl"
         DGIDB = "dgidb"

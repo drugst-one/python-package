@@ -2,11 +2,11 @@ from . import settings
 import requests
 import logging
 
-class License:
+class license:
     printed = False
     accepted = False
 
-license = License()
+license = license()
 
 def print_license():
     license_text = requests.get(
@@ -20,8 +20,8 @@ def print_license():
 def accept_license():
     global license
     if not license.printed:
-        logging.error('License needs to be read first. Call "drugstone.print_license()".')
+        logging.error('license needs to be read first. Call "drugstone.print_license()".')
         return
     license.accepted = True
-    logging.info('License accepted.')
+    logging.info('license accepted.')
     return

@@ -34,7 +34,7 @@ def download_network_graph(nodes: dict, path: str = "", name: str = "graph") -> 
     # Adds the edges to the network.
     edges = []
     for n, gene in nodes["genes"].items():
-        for e in gene["has_edges_to"]:
+        for e in gene["hasEdgesTo"]:
             edges.append((n, e))
     net.add_edges(edges)
 

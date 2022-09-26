@@ -21,7 +21,6 @@ from .scripts.fetch_edges import fetch_edges
 from .scripts.add_edges_to_genes import add_edges_to_genes
 from .scripts.merge_results import merge_results
 from .scripts.normalize_nodes import normalize_nodes
-from .scripts.check_result_size import check_result_size
 from .license import license
 
 
@@ -55,9 +54,9 @@ def new_task(
     normalized_params = normalize_task_parameter(parameters, internal_ids)
     # static task
     if static:
-        dataset = normalized_params["parameters"]["ppi_dataset"]
+        dataset = normalized_params["parameters"]["ppiDataset"]
         edges = fetch_edges(internal_ids, dataset)
-        task_result = add_edges_to_genes(extended_genes, edges)
+        task_result = add_edges_to_genes(extended_genes, edges, parameters['identifier'])
         genes_drugs = __get_dict_for_genes_and_drugs(static_drugs, static_genes)
         task_result = merge_results(task_result, genes_drugs)
         task_result = merge_results(task_result, static_result)
@@ -77,8 +76,7 @@ def new_task(
     task_params = __create_parameters(task_info)
     if task_info["done"]:
         raw_data = request_task_result(token)
-        normalized = normalize_nodes(raw_data, parameters['identifier'])
-        task_result = check_result_size(normalized, task_params)
+        task_result = normalize_nodes(raw_data, parameters['identifier'])
         return Task(result=task_result, raw_data=raw_data, info=task_info, params=task_params)
     return Task(info=task_info, params=task_params)
 

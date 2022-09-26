@@ -16,7 +16,7 @@ def fetch_edges(internal_ids: list, ppi_dataset: str):
     n_ids = []
 
     for i in internal_ids:
-        n_ids.append({"netex_id": i})
+        n_ids.append({"drugstoneId": i})
 
     data = {
         "nodes": n_ids,
