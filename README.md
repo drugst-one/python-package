@@ -311,6 +311,5 @@ Opens a new window with an upset plot of the results.
 
 
 
-Copyright: 2022 - Institute for Computational Systems Biology 
+Copyright: 2023 - Institute for Computational Systems Biology 
 by Prof. Dr. Jan Baumbach \
-Author: Ugur Turhan
