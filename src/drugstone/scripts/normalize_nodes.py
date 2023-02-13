@@ -53,8 +53,9 @@ def normalize_nodes(results: dict, identifier: str) -> dict:
             genes[node]['isResult'] = True
 
     # add information if node is connector node
-    for node in results['intermediateNodes']:
-        genes[node]['isConnector'] = True
+    if 'intermediateNodes' in results:
+        for node in results['intermediateNodes']:
+            genes[node]['isConnector'] = True
 
     # Normalizes the scores for the drugs.
     drug_scores = []
