@@ -22,4 +22,5 @@ from .new_tasks import new_tasks
 from .deep_search import deep_search
 from .task.models.drug import Drug
 from .task.models.gene import Gene
+from . import fetching
 from .license import print_license, accept_license, license

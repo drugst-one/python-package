@@ -80,9 +80,14 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
     if normalized_params["algorithm"] == "keypathwayminer" and "k" not in normalized_params["parameters"]:
         normalized_params["parameters"]["k"] = 5
     if normalized_params["target"] == "drug-target" and normalized_params["algorithm"] == "proximity":
-        warnings.warn("Network Proximity is not capable for Drug-Search!"
-                      + " Drug-Search algorithm is changed to TrustRank!    ")
+        warnings.warn("Network Proximity is not capable of Drug-Target-Search!"
+                      + " Algorithm is changed to TrustRank.    ")
         normalized_params["algorithm"] = "trustrank"
+    if normalized_params["target"] == "drug-target" and normalized_params["algorithm"] == "adjacentDrugs":
+        warnings.warn("First neighbour drugs is not capable of Drug-Target-Search!"
+                      + " Target is changed to 'drug'.")
+        normalized_params["target"] = "drug"
+
     normalized_params["parameters"]["seeds"] = seeds
     normalized_params["parameters"]["input_network"] = {"nodes": [], "edges": []}
     alg = normalized_params["algorithm"]

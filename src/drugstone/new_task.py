@@ -52,6 +52,11 @@ def new_task(
 
     internal_ids = [n[parameters['identifier']][0] for n in extended_genes if n['drugstoneType'] == 'protein']
     normalized_params = normalize_task_parameter(parameters, internal_ids)
+    if parameters['algorithm'] == 'adjacentDrugs':
+        from .fetching import getAdjacentDrugs
+        result = getAdjacentDrugs(normalized_params, extended_genes)
+        return Task(result=result, params=normalized_params, raw_data=result)
+
     # static task
     if static:
         dataset = normalized_params["parameters"]["ppiDataset"]

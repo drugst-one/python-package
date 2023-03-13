@@ -50,7 +50,7 @@ class TaskParameter:
             "multisteiner", "keypathwayminer", "trustrank",
             "closeness", "degree", "betweenness"
         ]
-        DRUG_SEARCH_VALUES = ["trustrank", "closeness", "degree", "proximity"]
+        DRUG_SEARCH_VALUES = ["trustrank", "closeness", "degree", "proximity", "adjacentDrugs"]
         ALGORITHM_VALUES = DRUG_TARGET_SEARCH_VALUES + DRUG_SEARCH_VALUES
         MULTISTEINER = "multisteiner"
         KEYPATHWAYMINER = "keypathwayminer"

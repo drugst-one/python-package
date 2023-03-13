@@ -213,7 +213,7 @@ r.create_upset_plot()
 ````
 parameters = {
     "identifier": "symbol", #("entrez" | "uniprot" | "ensg" will be supported in future versions)
-    "algorithm": "trustrank" | "multisteiner" | "keypathwayminer" | "closeness" | "degree" | "proximity" | "betweenness",
+    "algorithm": "adjacentDrugs", "trustrank" | "multisteiner" | "keypathwayminer" | "closeness" | "degree" | "proximity" | "betweenness",
     "ppiDataset": "NeDRex",
     "pdiDataset": "NeDRex",
     "resultSize": 20,
