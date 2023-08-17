@@ -15,7 +15,6 @@ def request_task_result(token: str) -> dict:
     """Returns the raw task result."""
 
     url_parameter = "?view=&fmt=&token=" + token
-
     return requests.get(
         Url.TASK_RESULTS + url_parameter,
         verify=False

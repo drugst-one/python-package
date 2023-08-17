@@ -1,7 +1,7 @@
 """
-drugstone.scripts.normalize_nodes
+drugstone.scripts.normalize_results
 
-This module implements the normalize_nodes function.
+This module implements the normalize_results function.
 
 :copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
 :author: Ugur Turhan
@@ -9,7 +9,7 @@ This module implements the normalize_nodes function.
 
 
 
-def normalize_nodes(results: dict, identifier: str) -> dict:
+def normalize_results(results: dict, identifier: str) -> dict:
     """Returns a normalized dict of the drugs and genes."""
 
     drugs = {}
@@ -106,16 +106,20 @@ def normalize_nodes(results: dict, identifier: str) -> dict:
             if e['from'] in drugstone_drug_id_to_label:
                 label = drugstone_drug_id_to_label[e['from']]
                 drugs[label]['hasEdgesTo'].append(e['to'])
+                e['from'] = drugstone_drug_id_to_label[e['from']]
             else:
+                # drug_id is in 'to'
                 label = drugstone_drug_id_to_label[e['to']]
                 drugs[label]['hasEdgesTo'].append(e['from'])
+                e['to'] = drugstone_drug_id_to_label[e['to']]
         else:
             # gene edge
             if any([x not in genes for x in [e['from'], e['to']]]):
                 #  some edge targets are somehow not in the network, this should be fixed in the backend
                 continue
             genes[e['from']]['hasEdgesTo'].append(e['to'])
-
+    
+    
     # Removes unnecessary properties from drugs.
     for _, drug in drugs.items():
         drug.pop("drugstoneId")
@@ -127,4 +131,4 @@ def normalize_nodes(results: dict, identifier: str) -> dict:
         gene.pop("drugstoneId")
         gene.pop("node_type")
 
-    return {"drugs": drugs, "genes": genes}
+    return {"drugs": drugs, "genes": genes, "edges" : edges}

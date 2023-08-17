@@ -46,13 +46,15 @@ class TaskResult:
 
     def __init__(
             self,
-            drugs: dict = dict({}),
-            genes: dict = dict({}),
-            raw_data: dict = dict({})) -> None:
+            edges: list = list(),
+            drugs: dict = dict(),
+            genes: dict = dict(),
+            raw_data: dict = dict()) -> None:
+        self.__edges = edges
         self.__drugs = drugs
         self.__genes = genes
         self.__raw_data = raw_data
-
+    
     def get_genes(self) -> dict:
         """Returns a dict with the genes."""
 
@@ -66,7 +68,11 @@ class TaskResult:
     def get_raw_result(self) -> dict:
         """Returns the raw data of the task."""
         return self.__raw_data
-
+    
+    def get_edges(self) -> list:
+        """Returns  the raw data of the Task"""
+        return self.__edges
+    
     def to_dict(self) -> dict:
         """Returns a dict with the result."""
 
