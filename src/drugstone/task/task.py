@@ -32,7 +32,7 @@ class Task:
         self.__params = params
         self.__raw_data = raw_data
         if result is None:
-            self.__result = dict({"drugs": {}, "genes": {}})
+            self.__result = dict({"drugs": {}, "genes": {}, "edges": []})
         else:
             self.__result = result
 
@@ -41,6 +41,7 @@ class Task:
 
         return TaskResult(drugs=self.__result["drugs"],
                           genes=self.__result["genes"],
+                          edges=self.__result["edges"],
                           raw_data=self.__raw_data)
 
     def get_info(self) -> dict:

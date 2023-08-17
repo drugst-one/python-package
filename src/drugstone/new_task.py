@@ -20,7 +20,7 @@ from .scripts.request_task_result import request_task_result
 from .scripts.fetch_edges import fetch_edges
 from .scripts.add_edges_to_genes import add_edges_to_genes
 from .scripts.merge_results import merge_results
-from .scripts.normalize_nodes import normalize_nodes
+from .scripts.normalize_nodes import normalize_results
 from .license import license
 
 
@@ -81,7 +81,7 @@ def new_task(
     task_params = __create_parameters(task_info)
     if task_info["done"]:
         raw_data = request_task_result(token)
-        task_result = normalize_nodes(raw_data, parameters['identifier'])
+        task_result = normalize_results(raw_data, parameters['identifier'])
         return Task(result=task_result, raw_data=raw_data, info=task_info, params=task_params)
     return Task(info=task_info, params=task_params)
 
