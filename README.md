@@ -329,4 +329,4 @@ drugstone_nodes = map_nodes(nodes, parameters)
 
 
 Copyright: 2023 - Institute for Computational Systems Biology 
-by Prof. Dr. Jan Baumbach \
+by Prof. Dr. Jan Baumbach.
