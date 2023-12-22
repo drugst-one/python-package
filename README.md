@@ -310,6 +310,23 @@ Downloads a json file with the results.
 Opens a new window with an upset plot of the results.
 
 
+## Miscellaneous
+
+### map nodes to Drugst.One proteins
+This will fetch all available information for the given nodes from the Drugst.One database as a list of dictionaries. Each node contains a key 'drugstoneType', where the value is 'protein' if the given node can be mapped to a protein. If a node can not be mapped, the 'drugstoneType' will be 'other'. <br>
+Be aware of the parameter dictionary with the key 'identifier', available options are one of 'symbol' (HUGO symbol), 'uniprot' (Uniprot AC), 'ensg' or 'ensembl' (Ensembl Gene ID), 'entrez' or 'ncbigene' (Entrez ID), depending on your input.
+```python
+from drugstone import map_nodes
+
+nodes = [
+    "CFTR", "TGFB1", "SCNN1B", "justatest"
+]
+
+parameters = {'identifier': 'symbol'}
+
+drugstone_nodes = map_nodes(nodes, parameters)
+```
+
 
 Copyright: 2023 - Institute for Computational Systems Biology 
 by Prof. Dr. Jan Baumbach \
