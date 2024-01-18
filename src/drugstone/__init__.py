@@ -10,6 +10,8 @@ For more information visit: https://drugst.one/
 :author: Ugur Turhan
 """
 
+from .external_scripts.map_nodes_to_internal_ids import map_nodes_to_internal_ids as map_nodes
+from .external_scripts.build_network import build_network
 import urllib3
 import logging
 
@@ -24,4 +26,3 @@ from .task.models.drug import Drug
 from .task.models.gene import Gene
 from . import fetching
 from .license import print_license, accept_license, license
-from .scripts.map_nodes_to_internal_ids import map_nodes_to_internal_ids as map_nodes

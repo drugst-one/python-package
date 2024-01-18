@@ -9,6 +9,7 @@ This module implements the fetch_edges function.
 
 import requests
 from .constants.url import Url
+from ..license import license
 
 
 def fetch_edges(internal_ids: list, ppi_dataset: str):
@@ -20,11 +21,12 @@ def fetch_edges(internal_ids: list, ppi_dataset: str):
 
     data = {
         "nodes": n_ids,
-        "dataset": ppi_dataset
+        "dataset": ppi_dataset,
+        "licenced": license.accepted
     }
-
-    return requests.post(
+    edges = requests.post(
         Url.FETCH_EDGES,
         verify=False,
         json=data
-    ).json()
+    )
+    return edges.json()

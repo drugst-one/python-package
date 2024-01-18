@@ -9,9 +9,9 @@ This module implements the map_nodes_to_internal_ids function.
 
 import requests
 import warnings
-from .constants.url import Url
-from .constants.task_parameter import TaskParameter
-from .normalize_task_parameter import normalize_task_parameter
+from ..scripts.constants.url import Url
+from ..scripts.constants.task_parameter import TaskParameter
+from ..scripts.normalize_task_parameter import normalize_task_parameter
 
 
 def map_nodes_to_internal_ids(

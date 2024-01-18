@@ -327,6 +327,25 @@ parameters = {'identifier': 'symbol'}
 drugstone_nodes = map_nodes(nodes, parameters)
 ```
 
+### build network
+This will fetch all available edges for a given list of proteins. Returned will be a list of node entities. Each of these nodes contains the key 'hasEdgesTo' with a list of all node ids this node has an edge to.<br>
+Be aware of the parameter dictionary with the key 'identifier', available options are one of 'symbol' (HUGO symbol), 'uniprot' (Uniprot AC), 'ensg' or 'ensembl' (Ensembl Gene ID), 'entrez' or 'ncbigene' (Entrez ID), depending on your input.
+```python
+import drugstone
+
+# optional
+drugstone.print_license()
+drugstone.accept_license()
+
+genes = [
+    "CFTR","TGFB1","TNFRSF1A","FCGR2A","ENG","DCTN4","CLCA4","STX1A","SCNN1G","SCNN1A","SCNN1B", "justatest"
+]
+
+parameters = {'identifier': 'symbol', 'ppiDataset': 'IID'}
+
+network = drugstone.build_network(genes, parameters)
+```
+
 
 Copyright: 2023 - Institute for Computational Systems Biology 
 by Prof. Dr. Jan Baumbach.

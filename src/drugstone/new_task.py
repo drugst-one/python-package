@@ -14,7 +14,7 @@ from .task.models.drug import Drug
 from .task.models.gene import Gene
 from .scripts.normalize_task_parameter import normalize_task_parameter
 from .scripts.wait_for_task_to_finish import wait_for_task_to_finish
-from .scripts.map_nodes_to_internal_ids import map_nodes_to_internal_ids
+from .external_scripts.map_nodes_to_internal_ids import map_nodes_to_internal_ids
 from .scripts.start_task import start_task
 from .scripts.request_task_result import request_task_result
 from .scripts.fetch_edges import fetch_edges
@@ -59,13 +59,16 @@ def new_task(
 
     # static task
     if static:
-        dataset = normalized_params["parameters"]["ppiDataset"]
-        edges = fetch_edges(internal_ids, dataset)
-        task_result = add_edges_to_genes(extended_genes, edges, parameters['identifier'])
-        genes_drugs = __get_dict_for_genes_and_drugs(static_drugs, static_genes)
-        task_result = merge_results(task_result, genes_drugs)
-        task_result = merge_results(task_result, static_result)
-        return Task(result=task_result, params=normalized_params)
+        warnings.warn("Static option is deprecated.")
+        # dataset = normalized_params["parameters"]["ppiDataset"]
+        # edges = fetch_edges(internal_ids, dataset)
+        # task_result = add_edges_to_genes(extended_genes, edges, parameters['identifier'])
+        # task_result['drugs'] = {}
+        # genes_drugs = __get_dict_for_genes_and_drugs(static_drugs, static_genes)
+        # task_result = merge_results(task_result, genes_drugs)
+        # task_result = merge_results(task_result, static_result)
+        # return Task(result=task_result, params=normalized_params)
+        return
 
     # no seeds and no static
     if not static and not seeds:

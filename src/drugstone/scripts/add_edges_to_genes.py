@@ -1,30 +1,45 @@
-
-
-import string
-
-
 def add_edges_to_genes(
         genes: list,
         edges: list, 
-        identifier: string
         ) -> dict:
 
+    result = []
+    print(genes)
+    print(edges)
+    
+    drugstone_id_to_network_id = {}
     for gene in genes:
+        if 'drugstoneId' not in gene:
+            continue
+        for drugstone_id in gene['drugstoneId']:
+            if drugstone_id in drugstone_id_to_network_id:
+                drugstone_id_to_network_id[drugstone_id].append(gene['id'])
+            else:
+                drugstone_id_to_network_id[drugstone_id] = [gene['id']]
+                
+    print('drugstone_id_to_network_id', drugstone_id_to_network_id)
+    
+    drugstone_id_to_edges = {}
+    for edge in edges:
+        if edge['proteinA'] not in drugstone_id_to_edges:
+            drugstone_id_to_edges[edge['proteinA']] = []
+        drugstone_id_to_edges[edge['proteinA']].extend(
+            drugstone_id_to_network_id.get(edge['proteinB'], []))
+        
+        if edge['proteinB'] not in drugstone_id_to_edges:
+            drugstone_id_to_edges[edge['proteinB']] = []
+        drugstone_id_to_edges[edge['proteinB']].extend(
+            drugstone_id_to_network_id.get(edge['proteinA'], []))
+        
+    print('drugstone_id_to_edges', drugstone_id_to_edges)
+    
+    for gene in genes:
+        gene["hasEdgesTo"] = []
         if "drugstoneId" in gene:
-            netex_edges = [n["proteinB"] for n in edges if gene["drugstoneId"] == n["proteinA"]]
-            symbol_edges = []
-            for e in netex_edges:
-                for g in genes:
-                    if identifier in g and "drugstoneId" in g and e == g["drugstoneId"]:
-                        symbol_edges.append(g[identifier])
-            gene["hasEdgesTo"] = symbol_edges
-        else:
-            gene["hasEdgesTo"] = []
-
-    result = {"drugs": {}, "genes": {}}
-
-    for gene in genes:
-        gene.pop("drugstoneId", None)
-        result["genes"][gene["id"]] = gene
+            for drugstone_id in gene['drugstoneId']:
+                gene["hasEdgesTo"].extend(list(
+                    set(drugstone_id_to_edges.get(drugstone_id, []))))
+                        
+        result.append(gene)
 
     return result
