@@ -4,9 +4,7 @@ def add_edges_to_genes(
         ) -> dict:
 
     result = []
-    print(genes)
-    print(edges)
-    
+
     drugstone_id_to_network_id = {}
     for gene in genes:
         if 'drugstoneId' not in gene:
@@ -17,8 +15,6 @@ def add_edges_to_genes(
             else:
                 drugstone_id_to_network_id[drugstone_id] = [gene['id']]
                 
-    print('drugstone_id_to_network_id', drugstone_id_to_network_id)
-    
     drugstone_id_to_edges = {}
     for edge in edges:
         if edge['proteinA'] not in drugstone_id_to_edges:
@@ -31,8 +27,6 @@ def add_edges_to_genes(
         drugstone_id_to_edges[edge['proteinB']].extend(
             drugstone_id_to_network_id.get(edge['proteinA'], []))
         
-    print('drugstone_id_to_edges', drugstone_id_to_edges)
-    
     for gene in genes:
         gene["hasEdgesTo"] = []
         if "drugstoneId" in gene:

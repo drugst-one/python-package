@@ -40,7 +40,7 @@ def normalize_results(results: dict, identifier: str) -> dict:
     # Adds to the genes if it's a seed or not.
     is_seed = results["nodeAttributes"]["isSeed"]
     for _, g_details in genes.items():
-        g_details["is_seed"] = False if g_details[identifier][0] not in is_seed else is_seed[g_details["symbol"][0]]
+        g_details["is_seed"] = False if g_details[identifier][0] not in is_seed else is_seed[g_details[identifier][0]]
 
     # Add information if node is result node
     for node in results['targetNodes']:

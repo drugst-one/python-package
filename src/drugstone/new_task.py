@@ -46,7 +46,6 @@ def new_task(
     """
 
     extended_genes = map_nodes_to_internal_ids(seeds, parameters)
-
     if 'identifier' not in parameters:
         parameters['identifier'] = 'symbol'
 

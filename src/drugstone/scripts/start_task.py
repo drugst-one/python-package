@@ -16,7 +16,6 @@ def start_task(params: dict) -> str:
 
     If there is no token for any reason, an empty str gets returned.
     """
-
     start_task_response = requests.post(
         Url.TASK,
         verify=False,
