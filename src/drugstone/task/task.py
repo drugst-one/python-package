@@ -32,16 +32,16 @@ class Task:
         self.__params = params
         self.__raw_data = raw_data
         if result is None:
-            self.__result = dict({"drugs": {}, "genes": {}, "edges": []})
+            self.__result = dict({"drugs": {}, "genes": {}, "pdis": []})
         else:
             self.__result = result
-
+            
     def get_result(self) -> TaskResult:
         """Returns a :class:`TaskResult` for the result of the task."""
 
         return TaskResult(drugs=self.__result["drugs"],
                           genes=self.__result["genes"],
-                          edges=self.__result["edges"],
+                          edges=self.__result["pdis"],
                           raw_data=self.__raw_data)
 
     def get_info(self) -> dict:

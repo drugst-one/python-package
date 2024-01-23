@@ -6,6 +6,8 @@ def getAdjacentDrugs(normalized_params, extended_genes):
     url = f'{API}/adjacent_drugs/'
     seed_drugstone_ids = []
     for gene in extended_genes:
+        if 'drugstoneId' not in gene:
+            continue
         seed_drugstone_ids.extend(gene['drugstoneId'])
     seed_drugstone_ids = [x[1:] for x in seed_drugstone_ids] # remove prefix p
     payload = {

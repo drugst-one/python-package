@@ -12,6 +12,7 @@ import warnings
 from ..scripts.constants.url import Url
 from ..scripts.constants.task_parameter import TaskParameter
 from ..scripts.normalize_task_parameter import normalize_task_parameter
+import logging
 
 
 def map_nodes_to_internal_ids(
@@ -50,6 +51,11 @@ def map_nodes_to_internal_ids(
         verify=False,
         json=data
     ).json()
+    
+    # print information for user
+    for node in mapped_nodes:
+        if 'drugstoneId' not in node:
+            logging.warning(f'Could not map node {node["id"]}.')
     return mapped_nodes
 
 
