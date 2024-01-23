@@ -55,7 +55,7 @@ def map_nodes_to_internal_ids(
     # print information for user
     for node in mapped_nodes:
         if 'drugstoneId' not in node:
-            logging.warning(f'Could not map node {node["id"]}.')
+            logging.warning(f'Could not map node "{node["id"]}".')
     return mapped_nodes
 
 

@@ -347,5 +347,5 @@ network = drugstone.build_network(genes, parameters)
 ```
 
 
-Copyright: 2023 - Institute for Computational Systems Biology 
+Copyright: 2024 - Institute for Computational Systems Biology 
 by Prof. Dr. Jan Baumbach.
