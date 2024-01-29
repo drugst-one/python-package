@@ -3,8 +3,8 @@ drugstone.task.scripts.download_network_graph
 
 This module implements the download_network_graph function.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 from pyvis.network import Network

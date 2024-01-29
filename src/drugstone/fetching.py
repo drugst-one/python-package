@@ -1,9 +1,9 @@
 import requests
 import json
-from .settings import API
+from .scripts.constants.url import api
 
 def getAdjacentDrugs(normalized_params, extended_genes):
-    url = f'{API}/adjacent_drugs/'
+    url = f'{api.BASE}adjacent_drugs/'
     seed_drugstone_ids = []
     for gene in extended_genes:
         if 'drugstoneId' not in gene:

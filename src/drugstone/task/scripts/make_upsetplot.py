@@ -3,8 +3,8 @@ drugstone.task.scripts.make_upsetplot
 
 This module implements the make_upset_plot function.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 from upsetplot import from_contents, plot

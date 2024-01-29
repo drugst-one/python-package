@@ -3,8 +3,8 @@ drugstone.scripts.normalize_results
 
 This module implements the normalize_results function.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 

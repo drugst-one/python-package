@@ -3,12 +3,12 @@ src.drugstone.scripts.fetch_edges
 
 This module implements the fetch_edges function.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 import requests
-from .constants.url import Url
+from .constants.url import api
 from ..license import license
 
 
@@ -25,7 +25,7 @@ def fetch_edges(internal_ids: list, ppi_dataset: str):
         "licenced": license.accepted
     }
     edges = requests.post(
-        Url.FETCH_EDGES,
+        api.FETCH_EDGES,
         verify=False,
         json=data
     )

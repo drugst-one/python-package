@@ -3,13 +3,13 @@ drugstone.scripts.map_nodes_to_internal_ids
 
 This module implements the map_nodes_to_internal_ids function.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 import requests
 import warnings
-from ..scripts.constants.url import Url
+from ..scripts.constants.url import api
 from ..scripts.constants.task_parameter import TaskParameter
 from ..scripts.normalize_task_parameter import normalize_task_parameter
 import logging
@@ -47,7 +47,7 @@ def map_nodes_to_internal_ids(
     # Sends the nodes to the drugstone API
     # and receives an extended list with the internal IDs.
     mapped_nodes = requests.post(
-        Url.MAP_NODES,
+        api.MAP_NODES,
         verify=False,
         json=data
     ).json()

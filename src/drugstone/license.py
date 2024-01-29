@@ -1,6 +1,6 @@
-from . import settings
 import requests
 import logging
+from .scripts.constants.url import api
 
 class license:
     printed = False
@@ -10,7 +10,7 @@ license = license()
 
 def print_license():
     license_text = requests.get(
-        f'{settings.API}/get_license',
+        f'{api.BASE}get_license',
         verify=False).json()["license"]
     logging.info(license_text)
     global license

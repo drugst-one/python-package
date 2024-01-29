@@ -3,8 +3,8 @@ drugstone.task.models.gene
 
 This module implements the class Gene for the drugstone API.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 from typing import List

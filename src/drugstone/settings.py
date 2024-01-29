@@ -1,1 +1,0 @@
-API = 'https://api.drugst.one'

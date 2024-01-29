@@ -3,12 +3,12 @@ drugstone.scripts.start_task
 
 This module implements the start_task function.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 import requests
-from .constants.url import Url
+from .constants.url import api
 
 
 def start_task(params: dict) -> str:
@@ -17,7 +17,7 @@ def start_task(params: dict) -> str:
     If there is no token for any reason, an empty str gets returned.
     """
     start_task_response = requests.post(
-        Url.TASK,
+        api.TASK,
         verify=False,
         json=params
     )

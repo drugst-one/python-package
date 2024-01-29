@@ -3,8 +3,8 @@ drugstone.scripts.normalize_task_parameter
 
 This module implements the normalize_task_parameter function.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 
@@ -22,8 +22,8 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
         "target": "drug",
         "parameters": {
             "target": "drug",
-            "ppiDataset": "STRING",
-            "pdiDataset": "DGidb",
+            "ppiDataset": "nedrex",
+            "pdiDataset": "nedrex",
             "licenced": license.accepted,
             "resultSize": 20,
             "config": {"identifier": "symbol"},

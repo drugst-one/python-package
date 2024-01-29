@@ -58,12 +58,19 @@ and can be accepted after reading with
 ```drugstone.accept_license()```. 
 
 
+## Available backends
+
+In the the main Drugst.One database is updated automatically weekly. This is the database used by default (https://api.drugst.one/). For more stable results, change the api endpoint to our stable API (https://api.stable.drugst.one/) using the function below. The Drugst.One stable version is updated yearly (on the first of January).
+
+```python
+drugstone.set_api('https://api.stable.drugst.one/')
+```
+
+
 ## Start a new task
 With Drugstone it is easy and convenient to search for drugs or drug-targets,
 starting with a list of genes.
 ```python
-from drugstone import new_task
-
 genes = [
     "CFTR", "TGFB1", "SCNN1B", 
     "DCTN4", "SCNN1A", "SCNN1G",
@@ -75,7 +82,7 @@ parameters = {
     "algorithm": "trustrank"
 }
 
-task = new_task(genes, parameters)
+task = drugstone.new_task(genes, parameters)
 
 r = task.get_result()
 
@@ -99,8 +106,6 @@ you can pass a list of algorithm values.
 For every algorithm, a task will be started, with 
 otherwise same parameter values.
 ````python
-from drugstone import new_tasks
-
 genes = [
     "CFTR", "TGFB1", "SCNN1B", 
     "DCTN4", "SCNN1A", "SCNN1G",
@@ -112,7 +117,7 @@ parameters = {
     "algorithms": ["trustrank", "closeness", "degree"]
 }
 
-tasks = new_tasks(genes, parameters)   
+tasks = drugstone.new_tasks(genes, parameters)   
 r = task.to_dict()                
 r.download_json()
 ````
@@ -121,8 +126,6 @@ r.download_json()
 `new_tasks()` accepts a list of parameter dictionaries.
 For every dictionary a task will be started.
 ````python
-from drugstone import new_tasks
-
 genes = [
     "CFTR", "TGFB1", "SCNN1B", 
     "DCTN4", "SCNN1A", "SCNN1G",
@@ -147,7 +150,7 @@ p3 = {
     "pdiDataset": "dgidb"
 }
 
-tasks = new_tasks(genes, [p1, p2, p3]) 
+tasks = drugstone.new_tasks(genes, [p1, p2, p3]) 
 r = tasks.get_result() 
 r.to_dict()                 
 r.download_json()  
@@ -159,8 +162,6 @@ r.create_upset_plot()
 You can get the union or intersection of tasks.
 That returns a TaskResult with the according result.
 ````python
-from drugstone import new_tasks
-
 genes = [
     "CFTR", "TGFB1", "SCNN1B", 
     "DCTN4", "SCNN1A", "SCNN1G",
@@ -172,7 +173,7 @@ parameters = {
     "algorithms": ["trustrank", "closeness", "degree"]
 }
 
-tasks = new_tasks(genes, parameters)    
+tasks = drugstone.new_tasks(genes, parameters)    
 
 u = tasks.get_union()                  
 u.download_json()
@@ -188,8 +189,6 @@ and then use the drug-target search results and the seed genes
 to perform a drug-search.
 Finally, a Task with the drug-search results will be returned. 
 ````python
-from drugstone import deep_search
-
 genes = [
     "CFTR", "TGFB1", "SCNN1B", 
     "DCTN4", "SCNN1A", "SCNN1G",
@@ -200,7 +199,7 @@ parameters = {
     "algorithm": "trustrank"
 }
 
-task = deep_search(genes, parameters)  
+task = drugstone.deep_search(genes, parameters)  
 r = tasks.get_result() 
 r.to_dict()                 
 r.download_json()
@@ -316,7 +315,7 @@ Opens a new window with an upset plot of the results.
 This will fetch all available information for the given nodes from the Drugst.One database as a list of dictionaries. Each node contains a key 'drugstoneType', where the value is 'protein' if the given node can be mapped to a protein. If a node can not be mapped, the 'drugstoneType' will be 'other'. <br>
 Be aware of the parameter dictionary with the key 'identifier', available options are one of 'symbol' (HUGO symbol), 'uniprot' (Uniprot AC), 'ensg' or 'ensembl' (Ensembl Gene ID), 'entrez' or 'ncbigene' (Entrez ID), depending on your input.
 ```python
-from drugstone import map_nodes
+import drugstone
 
 nodes = [
     "CFTR", "TGFB1", "SCNN1B", "justatest"
@@ -324,7 +323,7 @@ nodes = [
 
 parameters = {'identifier': 'symbol'}
 
-drugstone_nodes = map_nodes(nodes, parameters)
+drugstone_nodes = drugstone.map_nodes(nodes, parameters)
 ```
 
 ### build network

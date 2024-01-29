@@ -3,8 +3,8 @@ drugstone.scripts.wait_for_task_to_finish
 
 This module implements the wait_for_task_to_finish function.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 import logging

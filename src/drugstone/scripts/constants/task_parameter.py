@@ -3,8 +3,8 @@ drugstone.scripts.constants.task_parameter
 
 This module implements the class TaskParameter.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 

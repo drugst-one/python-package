@@ -3,8 +3,8 @@ drugstone.task.tasks_result
 
 This module implements the class :class:`TasksResult` for the drugstone API.
 
-:copyright: 2022 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
-:author: Ugur Turhan
+:copyright: 2024 Institute for Computational Systems Biology by Prof. Dr. Jan Baumbach
+ 
 """
 
 import sys
