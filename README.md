@@ -1,30 +1,29 @@
-# Drugstone
-This is the python package for the drugst.one platform.
+<h1 align="center">
+<img src="https://drugst.one/assets/logo_black.png" width="300">
+</h1><br>
 
-This package offers tools for drug-repurposing and 
-is a programmatic approach to the functionality of the web portal.
-For more information visit: https://drugst.one/
+This is the python package for the drugst.one platform. It offers tools for network-based drug repurposing and 
+is a programmatic interface to Drugst.one.
+
+- **Website:** https://drugst.one/
+- **Source code:** https://github.com/drugst-one/python-package
+- **Bug reports:** https://github.com/drugst-one/python-package/issues
 
 
 ## Installation
-Drugstone depends on a few packages to work. 
-You can use pip to install them.
-```console
+<!-- Drugstone depends on a few packages to work.  -->
+<!-- You can use pip to install them. -->
+<!-- ```console
 pip install urllib3 requests pandas pyvis upsetplot
-```
-Then you can install drugstone.
+``` -->
+Install drugstone.
 ```console
 pip install drugstone
 ```
-Finally, it should be possible to import drugstone to your python script.
+Import drugstone in python 
 ````python
 import drugstone
 ````
-You can use 
-```python
-import drugstone as ds
-```
-to access the complete drugstone API with the `ds.` notation.
 
 Drugstone officially supports Python 3.6+.
 
