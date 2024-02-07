@@ -38,10 +38,11 @@ class Task:
             
     def get_result(self) -> TaskResult:
         """Returns a :class:`TaskResult` for the result of the task."""
-
+        print('self.__result', self.__result)
         return TaskResult(drugs=self.__result["drugs"],
                           genes=self.__result["genes"],
-                          edges=self.__result["pdis"],
+                          edges=self.__result.get(
+                              "edges", {}) or self.__result.get("pdis", {}),
                           raw_data=self.__raw_data)
 
     def get_info(self) -> dict:
