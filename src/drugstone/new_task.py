@@ -49,6 +49,47 @@ def new_task(
     if 'identifier' not in parameters:
         parameters['identifier'] = 'symbol'
 
+    # in case of custom network input
+    ids = set()
+    if 'custom_edges' in parameters:
+        #  are a list of dicts like [{"fom":..., "to":...}, ...]
+        # we need to make the identifiers to internal ids
+        edge_node_ids = set([*(map(lambda x: x['from'], parameters['custom_edges'])), *(map(lambda x: x['to'], parameters['custom_edges']))])
+        for x in edge_node_ids:
+            ids.add(x)
+    if 'network_nodes' in parameters:
+        #  are a list of strings
+        for node in parameters['network_nodes']:
+            ids.add(node)
+    if len(ids) > 0:
+        background_network_ids = map_nodes_to_internal_ids(ids, parameters)
+        background_network_id_map = {
+            n['id']: n[parameters['identifier']][0] for n in background_network_ids}
+    
+    # map the custom edges and custom nodes to drugstone Ids
+    if 'custom_edges' in parameters:
+        mapped_custom_edges = []
+        for edge in parameters['custom_edges']:
+            from_internal = background_network_id_map.get(edge['from'], False)
+            to_internal = background_network_id_map.get(edge['to'], False)
+            if from_internal is False or to_internal is False:
+                warnings.warn(f"Could not map edge {edge['from']} - {edge['to']}.")
+                continue
+            edge['from'] = from_internal
+            edge['to'] = to_internal
+            mapped_custom_edges.append(edge)
+        parameters['custom_edges'] = mapped_custom_edges
+    if 'network_nodes' in parameters:
+        mapped_custom_nodes = []
+        for node in parameters['network_nodes']:
+            internal_id = background_network_id_map.get(node, False)
+            if internal_id is False:
+                warnings.warn(f"Could not map node {node}.")
+                continue
+            mapped_custom_nodes.append(
+                internal_id)
+        parameters['network_nodes'] = mapped_custom_nodes
+       
     internal_ids = [n[parameters['identifier']][0] for n in extended_genes if n['drugstoneType'] == 'protein']
     normalized_params = normalize_task_parameter(parameters, internal_ids)
     if parameters['algorithm'] == 'adjacentDrugs':

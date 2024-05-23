@@ -43,6 +43,7 @@ def normalize_results(results: dict, identifier: str) -> dict:
         g_details["is_seed"] = False if g_details[identifier][0] not in is_seed else is_seed[g_details[identifier][0]]
 
     # Add information if node is result node
+    print('results', results)
     for node in results['targetNodes']:
         try:
             # node is drug

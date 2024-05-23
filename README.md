@@ -181,6 +181,41 @@ i = tasks.get_intersection()
 i.download_json()
 ````
 
+### Use your own network
+You can add custom nodes and edges to the network, which may be considered for the drug-target or the drug search. Also, it is possible to ONLY consider your provided PPI-network and exclude PPI-edges provdided by Drugst.One.
+Please note that this is an experimental feature and is still being tested.
+```python
+import drugstone
+
+seeds = [
+    "CFTR", "TGFB1"
+]
+
+parameters = {
+    "target": "drug",
+    "algorithm": "trustrank",
+    "pdiDataset": 'nedrex',     # drug nodes and edges will still be taken from Drugst.One
+    "custom_edges": [   # add here your edges for you custom PPI
+        {"from": "CFTR", "to": "SCNN1G"},
+        {"from": "CFTR", "to": "SCNN1B"},
+        {"from": "TGFB1", "to": "DCTN4"},
+        {"from": "SCNN1B", "to": "SCNN1A"},
+        {"from": "SCNN1B", "to": "CLCA4"},
+        {"from": "TNFRSF1A", "to": "FCGR2A"}
+    ],
+    "exclude_drugstone_ppi_edges": True, # this parameter removes all Drugst.One PPI edges (only if edges in 'custom_edges' are provided)
+    "identifier": "symbol",
+    "include_indirect_drugs": True,
+    "network_nodes": ["CFTR", "TGFB1", "SCNN1B",    # add here your nodes for you custom PPI
+                      "DCTN4", "SCNN1A", "SCNN1G",
+                      "CLCA4", "TNFRSF1A", "FCGR2A"]
+}
+task = drugstone.new_task(seeds, parameters)
+r = task.get_result()
+genes = r.get_genes()
+drugs = r.get_drugs()
+```
+
 
 ## Combine a drug-target search with a drug search
 This will perform a drug-target search for the seed genes 

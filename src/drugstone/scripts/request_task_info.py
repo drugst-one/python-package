@@ -9,9 +9,17 @@ This module implements the request_task_info function.
 
 import requests
 from .constants.url import api
-
+import logging
+import time
 
 def request_task_info(token: str) -> dict:
-    return requests.get(
-        api.TASK + "?token=" + token,
-        verify=False).json()["info"]
+    for _ in range(3):
+        # 3 attempts due to possible connection issues
+        try:
+            return requests.get(
+                api.TASK + "?token=" + token,
+                verify=False).json()["info"]
+        except Exception as e:
+            logging.warning('ConnectionError occurred. Retrying...')
+            time.sleep(2)
+            pass
