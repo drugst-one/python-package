@@ -63,9 +63,10 @@ def new_task(
             ids.add(node)
     if len(ids) > 0:
         background_network_ids = map_nodes_to_internal_ids(ids, parameters)
+        print(background_network_ids)
         background_network_id_map = {
-            n['id']: n[parameters['identifier']][0] for n in background_network_ids}
-    
+            n['id']: n[parameters['identifier']][0] for n in background_network_ids if n['drugstoneType'] == 'protein'}
+
     # map the custom edges and custom nodes to drugstone Ids
     if 'custom_edges' in parameters:
         mapped_custom_edges = []

@@ -99,4 +99,6 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
             normalized_params["parameters"]["task_id"] = alg
     else:
         normalized_params["parameters"]["task_id"] = alg
+        
+    print('normalized_params', normalized_params)
     return normalized_params
