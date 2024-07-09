@@ -22,6 +22,7 @@ from .scripts.add_edges_to_genes import add_edges_to_genes
 from .scripts.merge_results import merge_results
 from .scripts.normalize_nodes import normalize_results
 from .license import license
+import copy
 
 
 def new_task(
@@ -45,6 +46,8 @@ def new_task(
     :return: :class:`Task` object
     """
 
+    parameters = copy.deepcopy(parameters)
+    
     extended_genes = map_nodes_to_internal_ids(seeds, parameters)
     if 'identifier' not in parameters:
         parameters['identifier'] = 'symbol'

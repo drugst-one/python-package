@@ -13,7 +13,7 @@ from .new_task import new_task
 from .task.task import Task
 from .task.tasks import Tasks
 from .scripts.normalize_task_parameter import normalize_task_parameter
-
+import copy
 
 def new_tasks(
         seeds: list = list([]),
@@ -31,7 +31,8 @@ def new_tasks(
     :param List[Task] static_tasks: (optional)
     :return: :class:`Tasks` object
     """
-
+    parameters = copy.deepcopy(parameters)
+    
     # static list of tasks
     if static:
         return Tasks(static_tasks)
