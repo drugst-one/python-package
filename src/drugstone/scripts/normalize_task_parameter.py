@@ -13,6 +13,7 @@ from typing import Dict
 from .task_id import TaskId
 from .constants.task_parameter import TaskParameter
 from ..license import license
+import copy
 
 def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
     """Normalizes the parameter dictionary from the user."""
@@ -90,6 +91,11 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
 
     normalized_params["parameters"]["seeds"] = seeds
     normalized_params["parameters"]["input_network"] = {"nodes": [], "edges": []}
+    if "custom_edges" in normalized_params["parameters"]:
+        # move custom_edges to input_network to support old parameter structure
+        normalized_params["parameters"]["input_network"]["edges"] = copy.deepcopy(normalized_params["parameters"]["custom_edges"])
+        normalized_params["parameters"]["custom_edges"] = True
+        
     alg = normalized_params["algorithm"]
     if "has_duplicate_algorithms" in user_params:
         if user_params["has_duplicate_algorithms"]:
