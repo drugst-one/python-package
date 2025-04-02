@@ -61,7 +61,8 @@ def download_network_graph(nodes: dict, path: str = "", name: str = "graph") -> 
     """)
     # net.toggle_physics(False)
     downloads_path = create_path(path, name, "html")
-    net.show(downloads_path)
+    net.write_html(downloads_path)
+    print("Drugst.One saved the network to: {}".format(downloads_path))
 
 # private static analysisPhysics = {
 #     enabled: true,
