@@ -7,6 +7,8 @@ This module implements the normalize_results function.
  
 """
 
+import copy
+
 
 
 def normalize_results(results: dict, identifier: str) -> dict:
@@ -70,6 +72,7 @@ def normalize_results(results: dict, identifier: str) -> dict:
                                 or type(drug["score"]) == float):
             old_score = drug["score"]
             new_score = round(old_score / max_drug_score, 4)
+            drug['score_raw'] = copy.deepcopy(old_score)
             drug["score"] = new_score
         else:
             drug["score"] = None
