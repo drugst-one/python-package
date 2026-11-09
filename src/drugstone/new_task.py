@@ -21,6 +21,7 @@ from .scripts.fetch_edges import fetch_edges
 from .scripts.add_edges_to_genes import add_edges_to_genes
 from .scripts.merge_results import merge_results
 from .scripts.normalize_nodes import normalize_results
+from .scripts.constants.task_parameter import TaskParameter
 from .license import license
 import copy
 
@@ -31,7 +32,9 @@ def new_task(
         static: bool = False,
         static_result: dict = dict({}),
         static_drugs: List[Drug] = list([]),
-        static_genes: List[Gene] = list([])) -> Task:
+        static_genes: List[Gene] = list([]),
+        quiet: bool = False,
+        drugstone_ids: bool = False) -> Task:
     """Returns a task.
 
     Starts a task, according to the user given seeds and parameters.
@@ -43,12 +46,15 @@ def new_task(
     :param dict static_result: (optional)
     :param List[Drug] static_drugs: (optional)
     :param List[Gene] static_genes: (optional)
+    :param bool quiet: (optional) If True, does not print the mapped nodes, parameters and raw results.
+    :param bool drugstone_ids: (optional) If True, drugs and genes of the result keep their drugstoneId,
+        e.g. for fetching.get_adjacent_disorders_of_drugs.
     :return: :class:`Task` object
     """
 
     parameters = copy.deepcopy(parameters)
     
-    extended_genes = map_nodes_to_internal_ids(seeds, parameters)
+    extended_genes = map_nodes_to_internal_ids(seeds, parameters, quiet)
     if 'identifier' not in parameters:
         parameters['identifier'] = 'symbol'
 
@@ -65,8 +71,9 @@ def new_task(
         for node in parameters['network_nodes']:
             ids.add(node)
     if len(ids) > 0:
-        background_network_ids = map_nodes_to_internal_ids(ids, parameters)
-        print(background_network_ids)
+        background_network_ids = map_nodes_to_internal_ids(ids, parameters, quiet)
+        if not quiet:
+            print(background_network_ids)
         background_network_id_map = {
             n['id']: n[parameters['identifier']][0] for n in background_network_ids if n['drugstoneType'] == 'protein'}
 
@@ -95,11 +102,15 @@ def new_task(
         parameters['network_nodes'] = mapped_custom_nodes
        
     internal_ids = [n[parameters['identifier']][0] for n in extended_genes if n['drugstoneType'] == 'protein']
-    normalized_params = normalize_task_parameter(parameters, internal_ids)
-    if parameters['algorithm'] == 'adjacentDrugs':
+    normalized_params = normalize_task_parameter(parameters, internal_ids, quiet)
+    if normalized_params['algorithm'] == 'adjacentDrugs':
         from .fetching import getAdjacentDrugs
         result = getAdjacentDrugs(normalized_params, extended_genes)
         return Task(result=result, params=normalized_params, raw_data=result)
+    if normalized_params['algorithm'] == 'adjacentDisorders':
+        from .fetching import getAdjacentDisorders
+        # disorders are not drugs or genes, so the result is only available as raw data
+        return Task(params=normalized_params, raw_data=getAdjacentDisorders(normalized_params, extended_genes))
 
     # static task
     if static:
@@ -121,6 +132,28 @@ def new_task(
                       + "or forgot to set static to True.")
         return Task()
 
+    # clustering runs on the input network (in the web app: the shown network), so send the seeds
+    # and, unless custom edges were given, the protein interactions between them (like autofill)
+    if normalized_params["target"] == "clustering":
+        identifier = parameters['identifier']
+        proteins = [n for n in extended_genes if n['drugstoneType'] == 'protein']
+        input_network = normalized_params["parameters"]["input_network"]
+        input_network["nodes"] = [{"id": n[identifier][0]} for n in proteins]
+        if not input_network["edges"]:
+            edges = fetch_edges([n['drugstoneId'] for n in proteins], normalized_params["parameters"]["ppiDataset"])
+            network_ids = {g['id']: g[identifier][0] for g in add_edges_to_genes(proteins, edges)}
+            pairs = {tuple(sorted((network_ids[g['id']], network_ids[t])))
+                     for g in proteins for t in g['hasEdgesTo'] if t in network_ids}
+            input_network["edges"] = [{"from": a, "to": b} for a, b in sorted(pairs) if a != b]
+
+        if normalized_params["algorithm"] == "louvain-clustering":
+            node_ids = {node["id"] for node in input_network["nodes"]}
+            if not any(edge["from"] != edge["to"] and edge["from"] in node_ids and edge["to"] in node_ids
+                       for edge in input_network["edges"]):
+                raise ValueError("Louvain clustering requires an interaction between two input proteins. "
+                                 "No such interaction was found in the selected PPI dataset or custom network. "
+                                 "Choose another dataset, add proteins or provide custom edges.")
+
     # dynamic task
     token = start_task(normalized_params)
     task_id = normalized_params["parameters"]["task_id"]
@@ -128,9 +161,12 @@ def new_task(
     task_params = __create_parameters(task_info)
     if task_info["done"]:
         raw_data = request_task_result(token)
-        task_result = normalize_results(raw_data, parameters['identifier'])
-        return Task(result=task_result, raw_data=raw_data, info=task_info, params=task_params)
-    return Task(info=task_info, params=task_params)
+        if normalized_params["algorithm"] in TaskParameter.AlgorithmValues.RAW_RESULT_VALUES:
+            # the backend returns these results unprocessed, they are only available as raw data
+            return Task(raw_data=raw_data, info=task_info, params=task_params, token=token)
+        task_result = normalize_results(raw_data, parameters['identifier'], quiet, drugstone_ids)
+        return Task(result=task_result, raw_data=raw_data, info=task_info, params=task_params, token=token)
+    return Task(info=task_info, params=task_params, token=token)
 
 
 def __create_parameters(info: dict) -> dict:

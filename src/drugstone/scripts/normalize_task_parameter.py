@@ -15,7 +15,7 @@ from .constants.task_parameter import TaskParameter
 from ..license import license
 import copy
 
-def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
+def normalize_task_parameter(user_params: dict, seeds: list, quiet: bool = False) -> dict:
     """Normalizes the parameter dictionary from the user."""
     # default parameters
     normalized_params: Dict[str, any] = {
@@ -27,7 +27,7 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
             "pdiDataset": "nedrex",
             "licenced": license.accepted,
             "resultSize": 20,
-            "config": {"identifier": "symbol"},
+            "config": {"identifier": "symbol", "reviewed": False, "nodeGroups": {}},
         }
     }
 
@@ -88,6 +88,9 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
         warnings.warn("First neighbour drugs is not capable of Drug-Target-Search!"
                       + " Target is changed to 'drug'.")
         normalized_params["target"] = "drug"
+    if normalized_params["algorithm"] == "pathway-enrichment":
+        for source, default in (("kegg", True), ("reactome", False), ("wiki", False)):
+            normalized_params["parameters"].setdefault(source, default)
 
     normalized_params["parameters"]["seeds"] = seeds
     normalized_params["parameters"]["input_network"] = {"nodes": [], "edges": []}
@@ -106,5 +109,6 @@ def normalize_task_parameter(user_params: dict, seeds: list) -> dict:
     else:
         normalized_params["parameters"]["task_id"] = alg
         
-    print('normalized_params', normalized_params)
+    if not quiet:
+        print('normalized_params', normalized_params)
     return normalized_params

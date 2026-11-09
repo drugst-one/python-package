@@ -17,7 +17,8 @@ import logging
 
 def map_nodes_to_internal_ids(
         nodes: list,
-        params: dict = dict({})) -> list:
+        params: dict = dict({}),
+        quiet: bool = False) -> list:
     """Maps the given nodes to the internal IDs.
 
     Returns a list of the internal IDs.
@@ -27,13 +28,13 @@ def map_nodes_to_internal_ids(
         if params["identifier"] in TaskParameter.IdentifierValues.IDENTIFIER_VALUES:
             identifier = params["identifier"]
         else:
-            identifier = get_default_identifier()
+            identifier = get_default_identifier(quiet)
             warnings.warn("The identifier: " + str(params["identifier"])
                           + "is not known to Drugstone!"
                           + " The identifier is changed to "
                           + str(identifier) + "!")
     else:
-        identifier = get_default_identifier()
+        identifier = get_default_identifier(quiet)
 
     formatted_nodes = []
     for node in nodes:
@@ -59,6 +60,6 @@ def map_nodes_to_internal_ids(
     return mapped_nodes
 
 
-def get_default_identifier() -> str:
-    parameters = normalize_task_parameter({}, [])
+def get_default_identifier(quiet: bool = False) -> str:
+    parameters = normalize_task_parameter({}, [], quiet)
     return parameters["parameters"]["config"]["identifier"]

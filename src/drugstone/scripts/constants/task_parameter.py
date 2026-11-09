@@ -48,10 +48,19 @@ class TaskParameter:
     class AlgorithmValues:
         DRUG_TARGET_SEARCH_VALUES = [
             "multisteiner", "keypathwayminer", "trustrank",
-            "closeness", "degree", "betweenness"
+            "closeness", "degree", "betweenness", "harmonic",
+            "first-neighbor", "connect", "connectSelected"
         ]
-        DRUG_SEARCH_VALUES = ["trustrank", "closeness", "degree", "proximity", "adjacentDrugs"]
-        ALGORITHM_VALUES = DRUG_TARGET_SEARCH_VALUES + DRUG_SEARCH_VALUES
+        DRUG_SEARCH_VALUES = [
+            "trustrank", "closeness", "degree", "proximity", "harmonic",
+            "adjacentDrugs", "quick", "super"
+        ]
+        GENE_SEARCH_VALUES = ["pathway-enrichment"]
+        CLUSTERING_VALUES = ["louvain-clustering", "leiden-clustering"]
+        DISORDER_SEARCH_VALUES = ["adjacentDisorders"]
+        ALGORITHM_VALUES = (DRUG_TARGET_SEARCH_VALUES + DRUG_SEARCH_VALUES + GENE_SEARCH_VALUES
+                            + CLUSTERING_VALUES + DISORDER_SEARCH_VALUES)
+        RAW_RESULT_VALUES = ["pathway-enrichment", "louvain-clustering", "leiden-clustering", "first-neighbor"]
         MULTISTEINER = "multisteiner"
         KEYPATHWAYMINER = "keypathwayminer"
         TRUSTRANK = "trustrank"
@@ -62,7 +71,7 @@ class TaskParameter:
     
     # Available options for the 'ppi' parameter.
     class PpiValues:
-        PPI_VALUES = ["intact", "string", "biogrid", "apid", "iid", "nedrex"]
+        PPI_VALUES = ["intact", "string", "biogrid", "apid", "iid", "nedrex", "omnipath"]
         STRING = "string"
         BIOGRID = "biogrid"
         APID = "apid"
@@ -76,6 +85,6 @@ class TaskParameter:
     
     # Available options for the 'target' parameter.
     class TargetValues:
-        TARGET_VALUES = ["drug", "drug-target"]
+        TARGET_VALUES = ["drug", "drug-target", "gene", "clustering"]
         DRUG = "drug"
         DRUG_TARGET = "drug-target"

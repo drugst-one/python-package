@@ -246,11 +246,13 @@ r.create_upset_plot()
 ````
 parameters = {
     "identifier": "symbol", #("entrez" | "uniprot" | "ensg" will be supported in future versions)
-    "algorithm": "adjacentDrugs", "trustrank" | "multisteiner" | "keypathwayminer" | "closeness" | "degree" | "proximity" | "betweenness",
+    "algorithm": "adjacentDrugs" | "trustrank" | "multisteiner" | "keypathwayminer" | "closeness" | "degree" | "proximity" | "betweenness"
+                 | "harmonic" | "first-neighbor" | "connect" | "connectSelected" | "quick" | "super"
+                 | "pathway-enrichment" | "louvain-clustering" | "leiden-clustering" | "adjacentDisorders",
     "ppiDataset": "NeDRex",
     "pdiDataset": "NeDRex",
     "resultSize": 20,
-    "target": "drug" | "drug-target",
+    "target": "drug" | "drug-target" | "gene" | "clustering",
     "includeIndirectDrugs": True | False,
     "includeNonApprovedDrugs": True | False,
     "maxDeg": sys.maxsize, # filter out nodes with high degrees
@@ -265,6 +267,68 @@ parameters = {
     "k": 5, # only in keypathwayminer
 } 
 ````
+
+Additional targets: `gene` for pathway enrichment and `clustering` for Louvain/Leiden.
+Set the target explicitly. New options include `alpha` and `kegg`/`reactome`/`wiki`
+(enrichment; KEGG only by default), `seed`/`ignore_isolated` (clustering), `resolution`
+(Louvain), `max_nodes` (Leiden) and `only_upstream_regulators` (First Neighbor).
+`quick` and `super` use fixed parameters and ignore custom edges.
+Louvain raises `ValueError` if no edge connects two distinct input proteins.
+
+Enrichment, clustering, First Neighbor and adjacent disorders return raw results through
+`get_raw_result()`; their `get_genes()` and `get_drugs()` are empty.
+Use `quiet=True` to reduce output and `drugstone_ids=True` to retain internal IDs in
+normalized results. Available datasets: `drugstone.fetching.get_datasets()`.
+
+## Pathways and disorders
+
+```python
+from drugstone import fetching
+
+task = drugstone.new_task(["EGFR", "GRB2"], {"algorithm": "pathway-enrichment", "target": "gene"})
+rows = task.get_result().get_raw_result()["tableView"]
+if rows:
+    row = rows[0]
+    pathway = fetching.get_pathway_network(task.get_token(), row["geneset"], row["pathway"], summary=True)
+```
+
+Use source/pathway pairs from `tableView`; each call replaces the task's stored pathway
+network. `get_pathway_sources()` lists sources. For associated disorders, use
+`new_task(seeds, {"algorithm": "adjacentDisorders"})`; drug indications are available via
+`fetching.get_adjacent_disorders_of_drugs(["dr9859"])` using internal drug IDs.
+
+## Expression and network utilities
+
+```python
+from drugstone import fetching, network
+
+fetching.get_tissues()  # choose a tissue ID
+fetching.get_tissue_expression(tissue="1", proteins=["EGFR"], identifier="symbol")
+# Alternatively supply token=task.get_token() instead of proteins.
+```
+
+Expression maps input identifiers to all matching proteins, returns values by internal
+`p…` ID and uses `None` for missing data; unmapped inputs are logged. Also available:
+`get_tissue_proteins(tissue_id, threshold)` and `get_max_tissue_expression(tissue)`.
+Mapped proteins already include `cellular_component` annotations where available.
+
+| Function in `drugstone.network` | Purpose |
+| --- | --- |
+| `create_network(net, config=None, groups=None)` | Store a network; anyone with its ID can load it |
+| `load_network(id)` / `get_network_link(id)` | Load it or get its web link |
+| `get_pruning_range(nodes, attribute)` / `prune_network(net, attribute, cutoff=...)` | Inspect/filter node properties; filtered network is `prunedNetwork` |
+| `get_pruning_distribution(nodes, attribute, path=None)` | Inspect values; optionally save a plot |
+| `update_result_network(token, net)` | Replace a task result's displayed network |
+| `overlay_directed_edges(net, identifier="uniprot")` | Annotate edges with OmniPath direction and activation/inhibition |
+| `recalculate_statistics(net, config)` | Return nodes with recalculated degree, clustering coefficient and SPD |
+
+Networks use `{"nodes": [...], "edges": [{"from": ..., "to": ...}]}`. For statistics,
+map nodes first with `drugstone.map_nodes()`. Config uses `identifier`,
+`interactionProteinProtein` and `interactionDrugProtein`; enable `custom_edges=True`
+and `exclude_drugstone_ppi_edges=True` to measure PPI degree on your own graph.
+Only proteins in the selected background graph are evaluated; statistics are undirected.
+For overlays, prefer UniProt IDs: ambiguous mappings use the first protein and unmapped
+nodes raise `ValueError`. See function docstrings for full options.
 
 For more information about the algorithms, please refer to <a href="https://drugst.one/doc#implementation_algorithms">https://drugst.one/doc#implementation_algorithms</a>.
 
@@ -281,6 +345,10 @@ Returns a dict with information about the task.
 
 `get_parameters() -> dict` \
 Returns a dict with the parameters of the task.
+
+
+`get_token() -> str` \
+Returns the server task token, or None if no server task was started.
 
 
 ## class TaskResult
