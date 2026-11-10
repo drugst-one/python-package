@@ -53,10 +53,14 @@ def map_nodes_to_internal_ids(
         json=data
     ).json()
     
-    # print information for user
-    for node in mapped_nodes:
-        if 'drugstoneId' not in node:
-            logging.warning(f'Could not map node "{node["id"]}".')
+    # print information for user, with quiet as one summary line
+    unmapped = [node["id"] for node in mapped_nodes if 'drugstoneId' not in node]
+    if quiet and unmapped:
+        logging.warning(f'Could not map {len(unmapped)} nodes, e.g. '
+                        + ', '.join(f'"{node}"' for node in unmapped[:5]) + '.')
+    elif not quiet:
+        for node in unmapped:
+            logging.warning(f'Could not map node "{node}".')
     return mapped_nodes
 
 

@@ -216,6 +216,17 @@ genes = r.get_genes()
 drugs = r.get_drugs()
 ```
 
+For large networks such as a complete PPI, `custom_edges` can also be given in a compact format:
+a list of nodes and the edges as pairs of positions in that list. It is about a third of the size
+of the edge list above.
+
+```python
+parameters["custom_edges"] = {
+    "nodes": ["CFTR", "SCNN1G", "SCNN1B", "TGFB1", "DCTN4"],
+    "edges": [[0, 1], [0, 2], [3, 4]]   # CFTR-SCNN1G, CFTR-SCNN1B, TGFB1-DCTN4
+}
+```
+
 
 ## Combine a drug-target search with a drug search
 This will perform a drug-target search for the seed genes 

@@ -81,6 +81,36 @@ class ExtendedWorkflowTests(unittest.TestCase):
                         new_task(['EGFR', 'GRB2'], params, quiet=True)
         start.assert_not_called()
 
+    @patch('drugstone.new_task.wait_for_task_to_finish', return_value={'done': False, 'algorithm': 'trustrank',
+                                                                      'parameters': {'inputNetwork': {}}})
+    @patch('drugstone.new_task.start_task', return_value='token')
+    @patch('drugstone.new_task.map_nodes_to_internal_ids')
+    def test_compact_custom_edges_map_nodes_and_drop_unmapped(self, mapping, start, wait):
+        mapping.side_effect = lambda ids, *a, **kw: [
+            {'id': name, 'symbol': [name.lower()], 'drugstoneType': 'protein', 'drugstoneId': ['p' + name]}
+            for name in ids if name != 'UNKNOWN']
+        custom = {'nodes': ['EGFR', 'UNKNOWN', 'GRB2', 'TP53'], 'edges': [[0, 2], [0, 1], [2, 3]]}
+        with self.assertWarnsRegex(UserWarning, 'Skipped 1 custom edges'):
+            new_task(['EGFR'], {'algorithm': 'trustrank', 'custom_edges': custom}, quiet=True)
+        sent = start.call_args.args[0]['parameters']
+        self.assertTrue(sent['custom_edges'])
+        self.assertEqual(sent['input_network']['edges'],
+                         {'nodes': ['egfr', 'grb2', 'tp53'], 'edges': [[0, 1], [1, 2]]})
+        self.assertEqual(custom['nodes'][1], 'UNKNOWN')  # the caller's parameters are not modified
+
+    @patch('drugstone.new_task.start_task')
+    @patch('drugstone.new_task.map_nodes_to_internal_ids')
+    def test_clustering_accepts_compact_custom_edges(self, mapping, start):
+        mapping.side_effect = lambda ids, *a, **kw: [
+            {'id': name, 'symbol': [name], 'drugstoneType': 'protein', 'drugstoneId': ['p' + name]} for name in ids]
+        start.side_effect = RuntimeError('started')
+        custom = {'nodes': ['EGFR', 'GRB2'], 'edges': [[0, 1]]}
+        with self.assertRaisesRegex(RuntimeError, 'started'):
+            new_task(['EGFR', 'GRB2'], {'algorithm': 'louvain-clustering', 'target': 'clustering',
+                                        'custom_edges': custom}, quiet=True)
+        self.assertEqual(start.call_args.args[0]['parameters']['input_network']['edges'],
+                         [{'from': 'EGFR', 'to': 'GRB2'}])
+
     def test_distribution_empty_missing_boolean_and_identical_values(self):
         result = network.get_pruning_distribution([
             {'properties': {'x': 2}}, {'properties': {'x': 2}}, {'properties': {'x': True}},
@@ -98,3 +128,17 @@ class ExtendedWorkflowTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class MappingWarningTests(unittest.TestCase):
+    @patch('drugstone.external_scripts.map_nodes_to_internal_ids.requests.post')
+    def test_quiet_summarizes_unmapped_nodes(self, post):
+        from drugstone.external_scripts.map_nodes_to_internal_ids import map_nodes_to_internal_ids
+        post.return_value.json.return_value = [{'id': 'EGFR', 'drugstoneId': ['p1']}] + [
+            {'id': f'X{i}'} for i in range(7)]
+        with self.assertLogs(level='WARNING') as logs:
+            map_nodes_to_internal_ids(['EGFR'], {'identifier': 'symbol'}, quiet=True)
+        self.assertEqual(logs.output, ['WARNING:root:Could not map 7 nodes, e.g. "X0", "X1", "X2", "X3", "X4".'])
+        with self.assertLogs(level='WARNING') as logs:
+            map_nodes_to_internal_ids(['EGFR'], {'identifier': 'symbol'})
+        self.assertEqual(len(logs.output), 7)
