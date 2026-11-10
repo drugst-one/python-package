@@ -33,8 +33,14 @@ class ExpressionNetworkTests(unittest.TestCase):
 
     @patch('drugstone.fetching.requests.post')
     def test_token_and_exclusive_arguments(self, post):
-        fetching.get_tissue_expression('7', token='task-token')
-        self.assertEqual(post.call_args.kwargs['json'], {'tissue': '7', 'token': 'task-token'})
+        # The proteins of the task result are sent, whatever identifier the task used.
+        result = {'nodeAttributes': {'nodeTypes': {'EGFR': 'protein', 'dr1': 'drug'},
+                                     'details': {'EGFR': {'drugstoneId': ['p2', 'p5']},
+                                                 'dr1': {'drugstoneId': 'dr1'}}}}
+        with patch('drugstone.fetching.request_task_result', return_value=result) as fetch:
+            fetching.get_tissue_expression('7', token='task-token')
+        fetch.assert_called_once_with('task-token')
+        self.assertEqual(post.call_args.kwargs['json'], {'tissue': '7', 'proteins': json.dumps(['2', '5'])})
         for args in ({}, {'proteins': [], 'token': 'task-token'}):
             with self.assertRaises(ValueError):
                 fetching.get_tissue_expression('7', **args)
@@ -43,25 +49,30 @@ class ExpressionNetworkTests(unittest.TestCase):
     @patch('drugstone.network.requests.post')
     def test_overlay_mapping_and_no_input_mutation(self, post, mapping):
         mapping.return_value = [
-            {'id': 'EGFR', 'drugstoneType': 'protein', 'drugstoneId': ['p2']},
+            {'id': 'EGFR', 'drugstoneType': 'protein', 'drugstoneId': ['p2', 'p4']},
             {'id': 'TP53', 'drugstoneType': 'protein', 'drugstoneId': ['p3']}]
         net = {'nodes': [{'id': 'EGFR'}, {'id': 'TP53'}],
-               'edges': [{'from': 'EGFR', 'to': 'TP53'}]}
+               'edges': [{'from': 'EGFR', 'to': 'TP53', 'id': 7}]}
         before = deepcopy(net)
-        post.return_value.json.return_value = [{'from': 'TP53', 'to': 'EGFR', 'is_directed': True}]
+        post.return_value.json.return_value = [
+            {'from': 'EGFR', 'to': 'TP53', 'id': '7', 'isDirected': True},
+            {'from': 'TP53', 'to': 'EGFR', 'id': '7_rev', 'isDirected': True}]
         result = network.overlay_directed_edges(net)
-        self.assertTrue(result[0]['is_directed'])
+        # integer ids are restored; the reverse direction keeps the backend's "_rev" id
+        self.assertEqual([e['id'] for e in result], [7, '7_rev'])
         self.assertEqual(net, before)
         payload = post.call_args.kwargs['json']
-        self.assertEqual(payload['drugstone_mapping'], {'p2': 'EGFR', 'p3': 'TP53'})
         self.assertEqual(payload['ppi_dataset'], 'OmniPath')
-        self.assertIn('id', payload['edges'][0])
+        self.assertEqual(payload['edges'], [{'from': 'EGFR', 'to': 'TP53', 'id': '7'}])
+        self.assertEqual(payload['drugstone_mapping'], {'p2': 'EGFR', 'p3': 'TP53'})
 
-    @patch(MAPPING, return_value=[{'id': 'unknown', 'drugstoneType': 'other'}])
+    @patch(MAPPING, return_value=[{'id': 'TP53', 'drugstoneType': 'protein', 'drugstoneId': ['p3']},
+                                  {'id': 'Imatinib', 'drugstoneType': 'drug'}])
     @patch('drugstone.network.requests.post')
-    def test_overlay_rejects_unmapped_nodes(self, post, mapping):
-        with self.assertRaisesRegex(ValueError, 'unknown'):
-            network.overlay_directed_edges({'nodes': [{'id': 'unknown'}], 'edges': []})
+    def test_overlay_keeps_edges_to_non_protein_nodes(self, post, mapping):
+        net = {'nodes': [{'id': 'TP53'}, {'id': 'Imatinib'}],
+               'edges': [{'from': 'TP53', 'to': 'Imatinib'}]}
+        self.assertEqual(network.overlay_directed_edges(net), [{'from': 'TP53', 'to': 'Imatinib', 'id': 0}])
         post.assert_not_called()
 
     @patch('drugstone.network.requests.post')

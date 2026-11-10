@@ -108,7 +108,7 @@ def get_pruning_distribution(nodes: list, attribute: str, path: str = None, cuto
     """
     values, missing = [], 0
     for node in nodes:
-        value = node.get('properties', {}).get(attribute)
+        value = (node.get('properties') or {}).get(attribute)
         if isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value):
             values.append(value)
         else:
@@ -125,10 +125,10 @@ def get_pruning_distribution(nodes: list, attribute: str, path: str = None, cuto
             bins[min(int((value - low) / width), bin_count - 1)]['count'] += 1
         result.update({'min': low, 'max': high, 'bins': bins})
     if path:
-        import matplotlib
-        matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
-        figure, (histogram, ranked) = plt.subplots(1, 2, figsize=(10, 4))
+        # a Figure without pyplot does not change the caller's matplotlib backend
+        from matplotlib.figure import Figure
+        figure = Figure(figsize=(10, 4))
+        histogram, ranked = figure.subplots(1, 2)
         histogram.bar([b['from'] for b in result['bins']], [b['count'] for b in result['bins']],
                       width=[b['to'] - b['from'] for b in result['bins']], align='edge', edgecolor='white')
         histogram.set(title=f'Distribution of {attribute}', xlabel=attribute, ylabel='nodes')
@@ -140,7 +140,6 @@ def get_pruning_distribution(nodes: list, attribute: str, path: str = None, cuto
             histogram.legend()
         figure.tight_layout()
         figure.savefig(path)
-        plt.close(figure)
         result['plot'] = path
     return result
 
@@ -149,25 +148,31 @@ def overlay_directed_edges(network: dict, identifier: str = 'symbol') -> list:
     """Annotates existing edges with OmniPath direction, stimulation and inhibition.
 
     Node IDs and edge endpoints use identifier (symbol, uniprot, entrez or ensg).
-    Unmapped nodes raise ValueError; ambiguous IDs use the first mapped protein, as in the
-    web interface. Both directions may be returned. Edges absent from OmniPath are retained.
-    The input network is not modified. Returns the annotated edge list.
+    Only edges between proteins are annotated; edges to other nodes (e.g. drugs) are returned
+    unchanged. Both directions may be returned, the reverse one with "_rev" appended to the
+    edge id. Edges absent from OmniPath are retained unchanged. The input network is not modified.
+    Returns the annotated edge list.
     """
     from .external_scripts.map_nodes_to_internal_ids import map_nodes_to_internal_ids
     mapped = map_nodes_to_internal_ids([n['id'] for n in network['nodes']],
                                       {'identifier': identifier}, quiet=True)
     nodes = {n['id']: n for n in mapped if n.get('drugstoneType') == 'protein' and n.get('drugstoneId')}
-    missing = [n['id'] for n in network['nodes'] if n['id'] not in nodes]
-    if missing:
-        raise ValueError(f'Could not map protein nodes: {missing}')
-    reverse = {n['drugstoneId'][0]: key for key, n in nodes.items()}
-    edges = [{**edge, 'id': str(i)} if 'id' not in edge else dict(edge)
-             for i, edge in enumerate(network.get('edges', []))]
+    edges = [dict(edge, id=edge.get('id', i)) for i, edge in enumerate(network.get('edges', []))]
+    # the backend uses edge ids as strings, so send them as strings and restore the originals afterwards
+    original_ids = {str(edge['id']): edge['id'] for edge in edges}
+    protein_edges = [dict(edge, id=str(edge['id'])) for edge in edges
+                     if edge['from'] in nodes and edge['to'] in nodes]
+    other_edges = [edge for edge in edges if edge['from'] not in nodes or edge['to'] not in nodes]
+    if not protein_edges:
+        return other_edges
     response = requests.post(f'{api.BASE}overlay_directed_edges/', json={
-        'ppi_dataset': 'OmniPath', 'licenced': False, 'edges': edges,
-        'nodes_mapped_dict': nodes, 'drugstone_mapping': reverse})
+        'ppi_dataset': 'OmniPath', 'licenced': False, 'edges': protein_edges, 'nodes_mapped_dict': nodes,
+        'drugstone_mapping': {n['drugstoneId'][0]: key for key, n in nodes.items()}})
     response.raise_for_status()
-    return response.json()
+    result = response.json()
+    for edge in result:
+        edge['id'] = original_ids.get(edge.get('id'), edge.get('id'))
+    return result + other_edges
 
 
 def recalculate_statistics(network: dict, config: dict) -> list:

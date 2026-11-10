@@ -88,6 +88,20 @@ def normalize_task_parameter(user_params: dict, seeds: list, quiet: bool = False
         warnings.warn("First neighbour drugs is not capable of Drug-Target-Search!"
                       + " Target is changed to 'drug'.")
         normalized_params["target"] = "drug"
+    # warn only, the backend still runs the task but may return an empty result (e.g. betweenness for 'drug')
+    algorithms_per_target = {
+        "drug": TaskParameter.AlgorithmValues.DRUG_SEARCH_VALUES,
+        "drug-target": TaskParameter.AlgorithmValues.DRUG_TARGET_SEARCH_VALUES,
+        "gene": TaskParameter.AlgorithmValues.GENE_SEARCH_VALUES,
+        "clustering": TaskParameter.AlgorithmValues.CLUSTERING_VALUES,
+    }
+    supported = algorithms_per_target.get(normalized_params["target"])
+    if (supported is not None and normalized_params["algorithm"] not in supported
+            and normalized_params["algorithm"] not in TaskParameter.AlgorithmValues.DISORDER_SEARCH_VALUES):
+        targets = [t for t, algorithms in algorithms_per_target.items() if normalized_params["algorithm"] in algorithms]
+        warnings.warn("The algorithm: " + normalized_params["algorithm"] + " is not meant for the target: "
+                      + normalized_params["target"] + "! The result may be empty. Supported targets: "
+                      + ", ".join(targets) + ".    ")
     if normalized_params["algorithm"] == "pathway-enrichment":
         for source, default in (("kegg", True), ("reactome", False), ("wiki", False)):
             normalized_params["parameters"].setdefault(source, default)

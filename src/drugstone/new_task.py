@@ -146,11 +146,11 @@ def new_task(
                      for g in proteins for t in g['hasEdgesTo'] if t in network_ids}
             input_network["edges"] = [{"from": a, "to": b} for a, b in sorted(pairs) if a != b]
 
-        if normalized_params["algorithm"] == "louvain-clustering":
-            node_ids = {node["id"] for node in input_network["nodes"]}
-            if not any(edge["from"] != edge["to"] and edge["from"] in node_ids and edge["to"] in node_ids
-                       for edge in input_network["edges"]):
-                raise ValueError("Louvain clustering requires an interaction between two input proteins. "
+        # louvain fails and leiden returns an empty result without such an interaction
+        node_ids = {node["id"] for node in input_network["nodes"]}
+        if not any(edge["from"] != edge["to"] and edge["from"] in node_ids and edge["to"] in node_ids
+                   for edge in input_network["edges"]):
+            raise ValueError("Clustering requires an interaction between two input proteins. "
                                  "No such interaction was found in the selected PPI dataset or custom network. "
                                  "Choose another dataset, add proteins or provide custom edges.")
 

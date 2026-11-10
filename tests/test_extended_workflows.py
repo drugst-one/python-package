@@ -15,15 +15,16 @@ class ExtendedWorkflowTests(unittest.TestCase):
                'geneInteractionDataset': {'name': 'NeDRex'}, 'network': {'nodes': [], 'edges': []},
                'nodeAttributes': {'isSeed': {'EGFR': True}}}
         fetch.return_value = raw
+        put.return_value.ok, put.return_value.text = True, '"worked!"'
         result = fetching.get_pathway_network('token', 'reactome', row['pathway'], summary=True)
+        fetch.assert_called_once_with('token')
         self.assertEqual(result['statistics']['adjPvalue'], 0.01)
         self.assertNotIn('genes', result['statistics'])
         self.assertEqual(result['isSeed'], {'EGFR': True})
         self.assertEqual(put.call_args.kwargs['params']['pathway'], row['pathway'])
-        put.reset_mock()
-        with self.assertRaises(ValueError):
+        put.return_value.ok = False
+        with self.assertRaisesRegex(ValueError, 'not in the task result'):
             fetching.get_pathway_network('token', 'kegg', row['pathway'])
-        put.assert_not_called()
         fetch.return_value = {}
         with self.assertRaises(ValueError):
             fetching.get_pathway_network('token', 'reactome', row['pathway'])
@@ -65,33 +66,34 @@ class ExtendedWorkflowTests(unittest.TestCase):
     @patch('drugstone.new_task.start_task')
     @patch('drugstone.new_task.fetch_edges', return_value=[])
     @patch('drugstone.new_task.map_nodes_to_internal_ids')
-    def test_louvain_rejects_edgeless_self_loop_and_outside_input_networks(self, mapping, edges, start):
+    def test_clustering_rejects_edgeless_self_loop_and_outside_input_networks(self, mapping, edges, start):
         mapping.side_effect = lambda *a, **kw: deepcopy([
             {'id': name, 'symbol': [name], 'drugstoneType': 'protein', 'drugstoneId': ['p' + str(i)]}
             for i, name in enumerate(['EGFR', 'GRB2', 'TP53']) if name in a[0]])
-        for custom in (None, [{'from': 'EGFR', 'to': 'EGFR'}],
-                       [{'from': 'EGFR', 'to': 'TP53'}]):
-            with self.subTest(custom=custom):
-                params = {'algorithm': 'louvain-clustering', 'target': 'clustering'}
-                if custom is not None:
-                    params['custom_edges'] = custom
-                with self.assertRaisesRegex(ValueError, 'interaction between two input proteins'):
-                    new_task(['EGFR', 'GRB2'], params, quiet=True)
+        for algorithm in ('louvain-clustering', 'leiden-clustering'):
+            for custom in (None, [{'from': 'EGFR', 'to': 'EGFR'}],
+                           [{'from': 'EGFR', 'to': 'TP53'}]):
+                with self.subTest(algorithm=algorithm, custom=custom):
+                    params = {'algorithm': algorithm, 'target': 'clustering'}
+                    if custom is not None:
+                        params['custom_edges'] = custom
+                    with self.assertRaisesRegex(ValueError, 'interaction between two input proteins'):
+                        new_task(['EGFR', 'GRB2'], params, quiet=True)
         start.assert_not_called()
 
     def test_distribution_empty_missing_boolean_and_identical_values(self):
         result = network.get_pruning_distribution([
             {'properties': {'x': 2}}, {'properties': {'x': 2}}, {'properties': {'x': True}},
-            {'properties': {'x': float('nan')}}, {}], 'x')
+            {'properties': {'x': float('nan')}}, {}, {'properties': None}], 'x')
         self.assertEqual(result['count'], 2)
-        self.assertEqual(result['missing'], 3)
+        self.assertEqual(result['missing'], 4)
         self.assertEqual(sum(b['count'] for b in result['bins']), 2)
         self.assertEqual(network.get_pruning_distribution([], 'x')['bins'], [])
 
     @patch('drugstone.fetching.requests.post')
     def test_disorder_prefixes_and_optional_dataset(self, post):
-        fetching.get_adjacent_disorders_of_drugs(['dr12', '34'], dataset='NeDRex')
-        self.assertEqual(post.call_args.kwargs['json'], {'drugs': ['12', '34'], 'licenced': False, 'dataset': 'NeDRex'})
+        fetching.get_adjacent_disorders_of_drugs(['dr12', '34', 56], dataset='NeDRex')
+        self.assertEqual(post.call_args.kwargs['json'], {'drugs': ['12', '34', 56], 'licenced': False, 'dataset': 'NeDRex'})
 
 
 if __name__ == '__main__':
