@@ -142,3 +142,14 @@ class MappingWarningTests(unittest.TestCase):
         with self.assertLogs(level='WARNING') as logs:
             map_nodes_to_internal_ids(['EGFR'], {'identifier': 'symbol'})
         self.assertEqual(len(logs.output), 7)
+
+
+class EmptyCompactEdgesTests(unittest.TestCase):
+    @patch('drugstone.new_task.wait_for_task_to_finish', return_value={'done': False, 'algorithm': 'trustrank',
+                                                                      'parameters': {'inputNetwork': {}}})
+    @patch('drugstone.new_task.start_task', return_value='token')
+    @patch('drugstone.new_task.map_nodes_to_internal_ids', return_value=[
+        {'id': 'EGFR', 'symbol': ['EGFR'], 'drugstoneType': 'protein', 'drugstoneId': ['p1']}])
+    def test_empty_compact_custom_edges(self, mapping, start, wait):
+        new_task(['EGFR'], {'algorithm': 'trustrank', 'custom_edges': {'nodes': [], 'edges': []}}, quiet=True)
+        self.assertEqual(start.call_args.args[0]['parameters']['input_network']['edges'], {'nodes': [], 'edges': []})

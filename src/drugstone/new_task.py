@@ -60,6 +60,7 @@ def new_task(
 
     # in case of custom network input
     ids = set()
+    background_network_id_map = {}
     compact_edges = isinstance(parameters.get('custom_edges'), dict)
     if compact_edges:
         # compact format {"nodes": [...], "edges": [[i, j], ...]} with positions in "nodes"

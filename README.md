@@ -284,7 +284,7 @@ Set the target explicitly. New options include `alpha` and `kegg`/`reactome`/`wi
 (enrichment; KEGG only by default), `seed`/`ignore_isolated` (clustering), `resolution`
 (Louvain), `max_nodes` (Leiden) and `only_upstream_regulators` (First Neighbor).
 `quick` and `super` use fixed parameters and ignore custom edges.
-Louvain raises `ValueError` if no edge connects two distinct input proteins.
+Louvain and Leiden raise `ValueError` if no edge connects two distinct input proteins.
 
 Enrichment, clustering, First Neighbor and adjacent disorders return raw results through
 `get_raw_result()`; their `get_genes()` and `get_drugs()` are empty.
@@ -330,7 +330,7 @@ Mapped proteins already include `cellular_component` annotations where available
 | `get_pruning_range(nodes, attribute)` / `prune_network(net, attribute, cutoff=...)` | Inspect/filter node properties; filtered network is `prunedNetwork` |
 | `get_pruning_distribution(nodes, attribute, path=None)` | Inspect values; optionally save a plot |
 | `update_result_network(token, net)` | Replace a task result's displayed network |
-| `overlay_directed_edges(net, identifier="uniprot")` | Annotate edges with OmniPath direction and activation/inhibition |
+| `overlay_directed_edges(net, identifier="symbol")` | Annotate edges with OmniPath direction and activation/inhibition |
 | `recalculate_statistics(net, config)` | Return nodes with recalculated degree, clustering coefficient and SPD |
 
 Networks use `{"nodes": [...], "edges": [{"from": ..., "to": ...}]}`. For statistics,
@@ -338,8 +338,8 @@ map nodes first with `drugstone.map_nodes()`. Config uses `identifier`,
 `interactionProteinProtein` and `interactionDrugProtein`; enable `custom_edges=True`
 and `exclude_drugstone_ppi_edges=True` to measure PPI degree on your own graph.
 Only proteins in the selected background graph are evaluated; statistics are undirected.
-For overlays, prefer UniProt IDs: ambiguous mappings use the first protein and unmapped
-nodes raise `ValueError`. See function docstrings for full options.
+Overlays check all proteins a node maps to; edges to unmapped or non-protein nodes and
+edges absent from OmniPath are returned unchanged. See function docstrings for full options.
 
 For more information about the algorithms, please refer to <a href="https://drugst.one/doc#implementation_algorithms">https://drugst.one/doc#implementation_algorithms</a>.
 
