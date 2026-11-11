@@ -21,6 +21,7 @@ from .scripts.fetch_edges import fetch_edges
 from .scripts.add_edges_to_genes import add_edges_to_genes
 from .scripts.merge_results import merge_results
 from .scripts.normalize_nodes import normalize_results
+from .scripts.constants.task_parameter import TaskParameter
 from .license import license
 import copy
 
@@ -31,7 +32,9 @@ def new_task(
         static: bool = False,
         static_result: dict = dict({}),
         static_drugs: List[Drug] = list([]),
-        static_genes: List[Gene] = list([])) -> Task:
+        static_genes: List[Gene] = list([]),
+        quiet: bool = False,
+        drugstone_ids: bool = False) -> Task:
     """Returns a task.
 
     Starts a task, according to the user given seeds and parameters.
@@ -43,18 +46,26 @@ def new_task(
     :param dict static_result: (optional)
     :param List[Drug] static_drugs: (optional)
     :param List[Gene] static_genes: (optional)
+    :param bool quiet: (optional) If True, does not print the mapped nodes, parameters and raw results.
+    :param bool drugstone_ids: (optional) If True, drugs and genes of the result keep their drugstoneId,
+        e.g. for fetching.get_adjacent_disorders_of_drugs.
     :return: :class:`Task` object
     """
 
     parameters = copy.deepcopy(parameters)
     
-    extended_genes = map_nodes_to_internal_ids(seeds, parameters)
+    extended_genes = map_nodes_to_internal_ids(seeds, parameters, quiet)
     if 'identifier' not in parameters:
         parameters['identifier'] = 'symbol'
 
     # in case of custom network input
     ids = set()
-    if 'custom_edges' in parameters:
+    background_network_id_map = {}
+    compact_edges = isinstance(parameters.get('custom_edges'), dict)
+    if compact_edges:
+        # compact format {"nodes": [...], "edges": [[i, j], ...]} with positions in "nodes"
+        ids.update(parameters['custom_edges']['nodes'])
+    elif 'custom_edges' in parameters:
         #  are a list of dicts like [{"fom":..., "to":...}, ...]
         # we need to make the identifiers to internal ids
         edge_node_ids = set([*(map(lambda x: x['from'], parameters['custom_edges'])), *(map(lambda x: x['to'], parameters['custom_edges']))])
@@ -65,13 +76,16 @@ def new_task(
         for node in parameters['network_nodes']:
             ids.add(node)
     if len(ids) > 0:
-        background_network_ids = map_nodes_to_internal_ids(ids, parameters)
-        print(background_network_ids)
+        background_network_ids = map_nodes_to_internal_ids(ids, parameters, quiet)
+        if not quiet:
+            print(background_network_ids)
         background_network_id_map = {
             n['id']: n[parameters['identifier']][0] for n in background_network_ids if n['drugstoneType'] == 'protein'}
 
     # map the custom edges and custom nodes to drugstone Ids
-    if 'custom_edges' in parameters:
+    if compact_edges:
+        parameters['custom_edges'] = __map_compact_edges(parameters['custom_edges'], background_network_id_map)
+    elif 'custom_edges' in parameters:
         mapped_custom_edges = []
         for edge in parameters['custom_edges']:
             from_internal = background_network_id_map.get(edge['from'], False)
@@ -95,11 +109,15 @@ def new_task(
         parameters['network_nodes'] = mapped_custom_nodes
        
     internal_ids = [n[parameters['identifier']][0] for n in extended_genes if n['drugstoneType'] == 'protein']
-    normalized_params = normalize_task_parameter(parameters, internal_ids)
-    if parameters['algorithm'] == 'adjacentDrugs':
+    normalized_params = normalize_task_parameter(parameters, internal_ids, quiet)
+    if normalized_params['algorithm'] == 'adjacentDrugs':
         from .fetching import getAdjacentDrugs
         result = getAdjacentDrugs(normalized_params, extended_genes)
         return Task(result=result, params=normalized_params, raw_data=result)
+    if normalized_params['algorithm'] == 'adjacentDisorders':
+        from .fetching import getAdjacentDisorders
+        # disorders are not drugs or genes, so the result is only available as raw data
+        return Task(params=normalized_params, raw_data=getAdjacentDisorders(normalized_params, extended_genes))
 
     # static task
     if static:
@@ -121,6 +139,29 @@ def new_task(
                       + "or forgot to set static to True.")
         return Task()
 
+    # clustering runs on the input network (in the web app: the shown network), so send the seeds
+    # and, unless custom edges were given, the protein interactions between them (like autofill)
+    if normalized_params["target"] == "clustering":
+        identifier = parameters['identifier']
+        proteins = [n for n in extended_genes if n['drugstoneType'] == 'protein']
+        input_network = normalized_params["parameters"]["input_network"]
+        input_network["nodes"] = [{"id": n[identifier][0]} for n in proteins]
+        input_network["edges"] = __expand_edges(input_network["edges"])
+        if not input_network["edges"]:
+            edges = fetch_edges([n['drugstoneId'] for n in proteins], normalized_params["parameters"]["ppiDataset"])
+            network_ids = {g['id']: g[identifier][0] for g in add_edges_to_genes(proteins, edges)}
+            pairs = {tuple(sorted((network_ids[g['id']], network_ids[t])))
+                     for g in proteins for t in g['hasEdgesTo'] if t in network_ids}
+            input_network["edges"] = [{"from": a, "to": b} for a, b in sorted(pairs) if a != b]
+
+        # louvain fails and leiden returns an empty result without such an interaction
+        node_ids = {node["id"] for node in input_network["nodes"]}
+        if not any(edge["from"] != edge["to"] and edge["from"] in node_ids and edge["to"] in node_ids
+                   for edge in input_network["edges"]):
+            raise ValueError("Clustering requires an interaction between two input proteins. "
+                                 "No such interaction was found in the selected PPI dataset or custom network. "
+                                 "Choose another dataset, add proteins or provide custom edges.")
+
     # dynamic task
     token = start_task(normalized_params)
     task_id = normalized_params["parameters"]["task_id"]
@@ -128,9 +169,39 @@ def new_task(
     task_params = __create_parameters(task_info)
     if task_info["done"]:
         raw_data = request_task_result(token)
-        task_result = normalize_results(raw_data, parameters['identifier'])
-        return Task(result=task_result, raw_data=raw_data, info=task_info, params=task_params)
-    return Task(info=task_info, params=task_params)
+        if normalized_params["algorithm"] in TaskParameter.AlgorithmValues.RAW_RESULT_VALUES:
+            # the backend returns these results unprocessed, they are only available as raw data
+            return Task(raw_data=raw_data, info=task_info, params=task_params, token=token)
+        task_result = normalize_results(raw_data, parameters['identifier'], quiet, drugstone_ids)
+        return Task(result=task_result, raw_data=raw_data, info=task_info, params=task_params, token=token)
+    return Task(info=task_info, params=task_params, token=token)
+
+
+def __map_compact_edges(custom_edges: dict, id_map: dict) -> dict:
+    """Maps the nodes of compact custom edges, keeping only edges whose nodes were mapped."""
+    nodes = custom_edges['nodes']
+    mapped_nodes, positions, unmapped = [], {}, []
+    for i, node in enumerate(nodes):
+        if node in id_map:
+            positions[i] = len(mapped_nodes)
+            mapped_nodes.append(id_map[node])
+        else:
+            unmapped.append(node)
+    if unmapped:
+        warnings.warn(f"Could not map {len(unmapped)} nodes of the custom edges, e.g. {', '.join(map(str, unmapped[:5]))}.")
+    mapped_edges = [[positions[a], positions[b]] for a, b in custom_edges['edges']
+                    if a in positions and b in positions]
+    skipped = len(custom_edges['edges']) - len(mapped_edges)
+    if skipped:
+        warnings.warn(f"Skipped {skipped} custom edges with unmapped nodes.")
+    return {'nodes': mapped_nodes, 'edges': mapped_edges}
+
+
+def __expand_edges(edges) -> list:
+    """Returns custom edges in the compact format as a list of {"from", "to"} edges."""
+    if isinstance(edges, dict):
+        return [{"from": edges['nodes'][a], "to": edges['nodes'][b]} for a, b in edges['edges']]
+    return edges
 
 
 def __create_parameters(info: dict) -> dict:

@@ -19,7 +19,9 @@ def new_tasks(
         seeds: list = list([]),
         parameters: Union[dict, List[dict]] = dict({}),
         static: bool = False,
-        static_tasks: List[Task] = list([])) -> Tasks:
+        static_tasks: List[Task] = list([]),
+        quiet: bool = False,
+        drugstone_ids: bool = False) -> Tasks:
     """Starts multiple tasks.
 
     Starts multiple tasks, according to the user given seeds and parameters.
@@ -29,6 +31,8 @@ def new_tasks(
     :param dict parameters: (optional) Dictionary of parameters for the tasks. Defaults to an empty dict {}.
     :param bool static: (optional)
     :param List[Task] static_tasks: (optional)
+    :param bool quiet: (optional) Passed to :func:`new_task` for every task.
+    :param bool drugstone_ids: (optional) Passed to :func:`new_task` for every task.
     :return: :class:`Tasks` object
     """
     parameters = copy.deepcopy(parameters)
@@ -58,7 +62,7 @@ def new_tasks(
         tasks = []
         for p in parameters:
             new_p = {**p, "has_duplicate_algorithms": has_duplicates}
-            t = new_task(seeds, new_p)
+            t = new_task(seeds, new_p, quiet=quiet, drugstone_ids=drugstone_ids)
             tasks.append(t)
         return Tasks(tasks)
 
@@ -79,10 +83,10 @@ def new_tasks(
                     "has_duplicate_algorithms": has_duplicates
                 }
                 t_param.pop("algorithms", None)
-                t = new_task(seeds, t_param)
+                t = new_task(seeds, t_param, quiet=quiet, drugstone_ids=drugstone_ids)
                 tasks.append(t)
             return Tasks(tasks)
 
     # Tasks with just a single task
-    task = new_task(seeds, parameters)
+    task = new_task(seeds, parameters, quiet=quiet, drugstone_ids=drugstone_ids)
     return Tasks([task])

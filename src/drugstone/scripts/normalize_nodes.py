@@ -11,7 +11,7 @@ import copy
 
 
 
-def normalize_results(results: dict, identifier: str) -> dict:
+def normalize_results(results: dict, identifier: str, quiet: bool = False, drugstone_ids: bool = False) -> dict:
     """Returns a normalized dict of the drugs and genes."""
 
     drugs = {}
@@ -45,7 +45,8 @@ def normalize_results(results: dict, identifier: str) -> dict:
         g_details["is_seed"] = False if g_details[identifier][0] not in is_seed else is_seed[g_details[identifier][0]]
 
     # Add information if node is result node
-    print('results', results)
+    if not quiet:
+        print('results', results)
     for node in results['targetNodes']:
         try:
             # node is drug
@@ -58,7 +59,10 @@ def normalize_results(results: dict, identifier: str) -> dict:
     # add information if node is connector node
     if 'intermediateNodes' in results:
         for node in results['intermediateNodes']:
-            genes[node]['isConnector'] = True
+            if node in drugstone_drug_id_to_label:
+                drugs[drugstone_drug_id_to_label[node]]['isConnector'] = True
+            else:
+                genes[node]['isConnector'] = True
 
     # Normalizes the scores for the drugs.
     drug_scores = []
@@ -126,13 +130,15 @@ def normalize_results(results: dict, identifier: str) -> dict:
     
     # Removes unnecessary properties from drugs.
     for _, drug in drugs.items():
-        drug.pop("drugstoneId")
+        if not drugstone_ids:
+            drug.pop("drugstoneId")
         drug.pop("trialLinks")
         drug.pop("node_type")
 
     # Removes unnecessary properties from genes.
     for _, gene in genes.items():
-        gene.pop("drugstoneId")
+        if not drugstone_ids:
+            gene.pop("drugstoneId")
         gene.pop("node_type")
 
     return {"drugs": drugs, "genes": genes, "edges" : edges}

@@ -27,9 +27,11 @@ class Task:
                  result: dict = None,
                  raw_data: dict = dict({}),
                  info: dict = dict({}),
-                 params: dict = dict({})) -> None:
+                 params: dict = dict({}),
+                 token: str = None) -> None:
         self.__info = info
         self.__params = params
+        self.__token = token
         self.__raw_data = raw_data
         if result is None:
             self.__result = dict({"drugs": {}, "genes": {}, "pdis": []})
@@ -53,3 +55,8 @@ class Task:
         """Returns a dict with the parameters of the task."""
 
         return self.__params
+
+    def get_token(self) -> str:
+        """Returns the token of the task on the server, None if no server task was started."""
+
+        return getattr(self, '_Task__token', None)

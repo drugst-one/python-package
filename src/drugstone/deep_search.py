@@ -12,7 +12,8 @@ from .task.task import Task
 from .new_task import new_task
 
 
-def deep_search(seeds: list, parameters: Union[dict, List[dict]] = dict({})) -> Task:
+def deep_search(seeds: list, parameters: Union[dict, List[dict]] = dict({}),
+                quiet: bool = False, drugstone_ids: bool = False) -> Task:
     """Performs a drug-target search of the seeds, followed by a drug search on the drug-target results.
 
     Starts with a drug-target search for the seed genes.
@@ -20,6 +21,8 @@ def deep_search(seeds: list, parameters: Union[dict, List[dict]] = dict({})) -> 
 
     :param list seeds: List of seed nodes for the task.
     :param dict parameters: (optional) Dictionary of parameters for the task. Defaults to an empty dict {}.
+    :param bool quiet: (optional) Passed to :func:`new_task` for both searches.
+    :param bool drugstone_ids: (optional) Passed to :func:`new_task` for both searches.
     :return: :class:`Task` object
     """
 
@@ -51,11 +54,11 @@ def deep_search(seeds: list, parameters: Union[dict, List[dict]] = dict({})) -> 
         d_params["has_duplicate_algorithms"] = True
 
     # target search
-    t_search = new_task(seeds, t_params)
+    t_search = new_task(seeds, t_params, quiet=quiet, drugstone_ids=drugstone_ids)
     t_result = t_search.get_result().get_genes()
     # # keypathwayminer sometimes does not return all seeds
     targets = list({*seeds, *list(t_result.keys())})
 
     # drug search
-    d_search = new_task(targets, d_params)
+    d_search = new_task(targets, d_params, quiet=quiet, drugstone_ids=drugstone_ids)
     return d_search
